@@ -1,10 +1,10 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
-import { projects } from "../data/projects";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { useFeaturedProjects } from "../hooks/useFeaturedProjects";
 
 export function Home() {
-  const featuredProjects = projects.slice(0, 3);
+  const { projects: featuredProjects, loading, error } = useFeaturedProjects(3);
 
   return (
     <div>
@@ -52,34 +52,56 @@ export function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProjects.map((project) => (
-            <Link
-              key={project.id}
-              to={`/projects/${project.id}`}
-              className="group"
-            >
-              <div className="relative aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
-                <ImageWithFallback
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+        {error && (
+          <p className="text-sm text-red-500 mb-4">
+            Failed to load projects. Please try again later.
+          </p>
+        )}
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="animate-pulse space-y-4 rounded-lg bg-gray-100 p-4"
+              >
+                <div className="aspect-[4/3] rounded-md bg-gray-200" />
+                <div className="h-5 w-2/3 rounded bg-gray-200" />
+                <div className="h-4 w-1/3 rounded bg-gray-200" />
+                <div className="h-4 w-full rounded bg-gray-200" />
               </div>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl group-hover:text-gray-600 transition-colors">
-                  {project.title}
-                </h3>
-                <ArrowRight
-                  size={20}
-                  className="text-gray-400 group-hover:text-gray-900 group-hover:translate-x-1 transition-all"
-                />
-              </div>
-              <p className="text-gray-600 mb-2">{project.category}</p>
-              <p className="text-gray-500">{project.description}</p>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredProjects.map((project) => (
+              <Link
+                key={project.id}
+                to={`/projects/${project.id}`}
+                className="group"
+              >
+                <div className="relative aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                  <ImageWithFallback
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl group-hover:text-gray-600 transition-colors">
+                    {project.title}
+                  </h3>
+                  <ArrowRight
+                    size={20}
+                    className="text-gray-400 group-hover:text-gray-900 group-hover:translate-x-1 transition-all"
+                  />
+                </div>
+                <p className="text-gray-600 mb-2">{project.category}</p>
+                <p className="text-gray-500 line-clamp-2">{project.description}</p>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <Link
           to="/projects"
