@@ -107,6 +107,8 @@ type SiteInfo = {
   name: string;
   role: string;
   location: string;
+  is_available: boolean;
+  availability_text: string;
   hero_headline: string;
   hero_description: string;
   hero_cta_primary: string;
@@ -202,6 +204,8 @@ const DEFAULT_SITE_INFO: SiteInfo = {
   name: "",
   role: "",
   location: "",
+  is_available: true,
+  availability_text: "",
   hero_headline: "",
   hero_description: "",
   hero_cta_primary: "",
@@ -331,6 +335,9 @@ export function Admin() {
           name: row.name ?? "",
           role: row.role ?? "",
           location: row.location ?? "",
+          is_available:
+            typeof row.is_available === "boolean" ? row.is_available : true,
+          availability_text: row.availability_text ?? "",
           hero_headline: row.hero_headline ?? "",
           hero_description: row.hero_description ?? "",
           hero_cta_primary: row.hero_cta_primary ?? "",
@@ -1084,6 +1091,45 @@ export function Admin() {
                     contact_email: e.target.value,
                   }))
                 }
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 items-start">
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                id="is_available"
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                checked={siteInfo.is_available}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    is_available: e.target.checked,
+                  }))
+                }
+              />
+              <label
+                htmlFor="is_available"
+                className="text-sm font-medium text-gray-700 select-none"
+              >
+                Currently available
+              </label>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Availability text
+              </label>
+              <Textarea
+                rows={2}
+                value={siteInfo.availability_text}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    availability_text: e.target.value,
+                  }))
+                }
+                placeholder="e.g. Currently open to junior product design opportunities."
               />
             </div>
           </div>
@@ -2445,6 +2491,129 @@ export function Admin() {
           </div>
 
           <div className="space-y-4">
+            {/* Experience list */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium">Experience</h3>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    setAboutInfo((prev) => ({
+                      ...prev,
+                      experience: [
+                        ...prev.experience,
+                        {
+                          role: "",
+                          company: "",
+                          period: "",
+                          description: "",
+                        },
+                      ],
+                    }))
+                  }
+                >
+                  <Plus className="w-4 h-4" />
+                  Add experience
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {aboutInfo.experience.map((item, index) => (
+                  <div
+                    key={`${item.role}-${item.company}-${index}`}
+                    className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs text-gray-500">
+                        #{index + 1} Experience
+                      </p>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() =>
+                          setAboutInfo((prev) => ({
+                            ...prev,
+                            experience: prev.experience.filter(
+                              (_, i) => i !== index,
+                            ),
+                          }))
+                        }
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <Input
+                        placeholder="Role"
+                        value={item.role}
+                        onChange={(e) =>
+                          setAboutInfo((prev) => ({
+                            ...prev,
+                            experience: prev.experience.map((exp, i) =>
+                              i === index
+                                ? { ...exp, role: e.target.value }
+                                : exp,
+                            ),
+                          }))
+                        }
+                      />
+                      <Input
+                        placeholder="Company"
+                        value={item.company}
+                        onChange={(e) =>
+                          setAboutInfo((prev) => ({
+                            ...prev,
+                            experience: prev.experience.map((exp, i) =>
+                              i === index
+                                ? { ...exp, company: e.target.value }
+                                : exp,
+                            ),
+                          }))
+                        }
+                      />
+                    </div>
+                    <Input
+                      placeholder="Period"
+                      value={item.period}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          experience: prev.experience.map((exp, i) =>
+                            i === index
+                              ? { ...exp, period: e.target.value }
+                              : exp,
+                          ),
+                        }))
+                      }
+                    />
+                    <Textarea
+                      rows={3}
+                      placeholder="Description"
+                      value={item.description}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          experience: prev.experience.map((exp, i) =>
+                            i === index
+                              ? { ...exp, description: e.target.value }
+                              : exp,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+                {aboutInfo.experience.length === 0 && (
+                  <p className="text-xs text-gray-500">
+                    No experience items yet. Add your roles and responsibilities
+                    here.
+                  </p>
+                )}
+              </div>
+            </div>
+
             {/* Colleague tags */}
             <div className="space-y-2">
               <label className="text-sm font-medium mb-1 block">

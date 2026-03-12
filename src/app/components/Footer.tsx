@@ -1,16 +1,16 @@
-import { Linkedin, Mail, Github, Dribbble } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
+import { useSiteInfo } from "../hooks/useSiteInfo";
 
 export function Footer() {
+  const { name, role, contactEmail, linkedinUrl } = useSiteInfo();
+
   return (
     <footer className="bg-gray-50 border-t border-gray-200 mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="mb-4">Alex Morgan</h3>
-            <p className="text-gray-600">
-              Product Designer crafting meaningful digital experiences through
-              user-centered design.
-            </p>
+            <h3 className="mb-4">{name}</h3>
+            <p className="text-gray-600">{role}</p>
           </div>
 
           <div>
@@ -26,11 +26,6 @@ export function Footer() {
                   About
                 </a>
               </li>
-              <li>
-                <a href="/contact" className="text-gray-600 hover:text-gray-900">
-                  Contact
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -38,7 +33,7 @@ export function Footer() {
             <h3 className="mb-4">Connect</h3>
             <div className="flex gap-4">
               <a
-                href="https://linkedin.com"
+                href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-gray-900"
@@ -47,25 +42,7 @@ export function Footer() {
                 <Linkedin size={20} />
               </a>
               <a
-                href="https://dribbble.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900"
-                aria-label="Dribbble"
-              >
-                <Dribbble size={20} />
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900"
-                aria-label="GitHub"
-              >
-                <Github size={20} />
-              </a>
-              <a
-                href="mailto:alex@example.com"
+                href={`mailto:${contactEmail}`}
                 className="text-gray-600 hover:text-gray-900"
                 aria-label="Email"
               >
