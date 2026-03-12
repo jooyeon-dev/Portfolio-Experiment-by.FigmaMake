@@ -66,7 +66,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600" />
+        <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600">
+          <p>© 2026 Jooyeon Choi. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );
