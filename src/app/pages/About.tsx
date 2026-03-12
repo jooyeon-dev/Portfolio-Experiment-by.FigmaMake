@@ -64,6 +64,13 @@ const FALLBACK_TOOLS = [
   "Jira",
 ];
 
+function toSimpleIconSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\(.*?\)/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
 export function About() {
   const { about, siteInfo } = useAboutPageContent();
 
@@ -259,27 +266,42 @@ export function About() {
           <h2 className="text-3xl mb-8">Skills &amp; Tools</h2>
           {hasSkills && (
             <div className="mb-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
+                Skills
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {skills.map((skill) => (
                   <div
                     key={skill}
-                    className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+                    className="p-3 bg-gray-50 rounded-lg flex items-center gap-2"
                   >
-                    {skill}
+                    <span className="text-sm text-gray-700">{skill}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
           {hasTools && (
-            <div className="pt-6 border-t border-gray-200">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="mt-10">
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
+                Tools
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {tools.map((tool) => (
                   <div
                     key={tool}
-                    className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+                    className="p-3 bg-gray-50 rounded-lg flex items-center gap-3"
                   >
-                    {tool}
+                    <img
+                      src={`https://cdn.simpleicons.org/${toSimpleIconSlug(tool)}/000000`}
+                      alt={tool}
+                      className="w-4 h-4"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display =
+                          "none";
+                      }}
+                    />
+                    <span className="text-sm text-gray-700">{tool}</span>
                   </div>
                 ))}
               </div>
