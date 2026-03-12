@@ -70,10 +70,18 @@ const FALLBACK_AVAILABILITY_TEXT =
   "Currently open to new junior product design opportunities.";
 
 export function About() {
-  const { about, siteInfo } = useAboutPageContent();
+  const { about, siteInfo, loading } = useAboutPageContent();
 
   const name = siteInfo?.name?.trim() || FALLBACK_NAME;
-  const location = siteInfo?.location?.trim() || FALLBACK_LOCATION;
+  const basedIn =
+    about?.based_in && about.based_in.trim().length > 0
+      ? about.based_in.trim()
+      : null;
+  const location =
+    basedIn ||
+    (siteInfo?.location && siteInfo.location.trim().length > 0
+      ? siteInfo.location.trim()
+      : FALLBACK_LOCATION);
   const role = siteInfo?.role?.trim() || FALLBACK_ROLE;
   const email = siteInfo?.contact_email?.trim() || FALLBACK_EMAIL;
   const linkedinUrl = siteInfo?.linkedin_url?.trim() || FALLBACK_LINKEDIN;
@@ -83,30 +91,70 @@ export function About() {
     siteInfo?.availability_text?.trim() || FALLBACK_AVAILABILITY_TEXT;
 
   const photoUrl = about?.photo_url || FALLBACK_PHOTO_URL;
-  const introText = about?.intro_text?.trim()
-    ? about.intro_text.trim()
-    : FALLBACK_INTRO.join("\n\n");
-  const introParagraphs = introText.split("\n\n");
+  const introText =
+    about?.intro_text && about.intro_text.trim().length > 0
+      ? about.intro_text.trim()
+      : "";
+  const introParagraphs =
+    introText.length > 0 ? introText.split("\n\n") : [];
   const resumeUrl = about?.resume_url || null;
 
-  const experience =
-    about?.experience && about.experience.length > 0
-      ? about.experience
-      : FALLBACK_EXPERIENCE;
+  const experience = about?.experience ?? [];
+  const skills = about?.skills ?? [];
+  const tools = about?.tools ?? [];
 
-  const skills =
-    about?.skills && about.skills.length > 0 ? about.skills : FALLBACK_SKILLS;
+  const hasExperience = experience.length > 0;
+  const hasSkills = skills.length > 0;
+  const hasTools = tools.length > 0;
 
-  const tools =
-    about?.tools && about.tools.length > 0 ? about.tools : FALLBACK_TOOLS;
+  const headerTitle = "About Me";
+  const headerSubtitle =
+    (about?.intro_subtitle && about.intro_subtitle.trim().length > 0
+      ? about.intro_subtitle.trim()
+      : "") ||
+    "Passionate about creating intuitive and delightful user experiences";
+  const showHeader =
+    headerTitle.trim().length > 0 || headerSubtitle.trim().length > 0;
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="mb-16 animate-pulse">
+          <div className="h-8 md:h-10 bg-gray-200 rounded w-40 mb-3" />
+          <div className="h-5 bg-gray-200 rounded w-72" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 animate-pulse">
+          <div>
+            <div className="aspect-square rounded-lg bg-gray-200" />
+          </div>
+          <div className="space-y-4">
+            <div className="h-6 bg-gray-200 rounded w-48" />
+            <div className="h-4 bg-gray-200 rounded w-32" />
+            <div className="h-4 bg-gray-200 rounded w-full" />
+            <div className="h-4 bg-gray-200 rounded w-5/6" />
+            <div className="h-10 bg-gray-200 rounded-full w-40" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       {/* Header */}
-      <div className="mb-16">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl mb-4">About</h1>
-        <p className="text-xl text-gray-600">{role}</p>
-      </div>
+      {showHeader && (
+        <div className="mb-16">
+          {headerTitle.trim().length > 0 && (
+            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-4">
+              {headerTitle}
+            </h1>
+          )}
+          {headerSubtitle.trim().length > 0 && (
+            <p className="text-xl text-gray-600">{headerSubtitle}</p>
+          )}
+        </div>
+      )}
 
       {/* Profile Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
@@ -122,6 +170,23 @@ export function About() {
         <div className="flex flex-col justify-center">
           <h2 className="text-3xl mb-4">Hello, I'm {name}</h2>
           <p className="text-gray-600 mb-4">{location}</p>
+          {((about?.languages && about.languages.trim().length > 0) ||
+            (about?.studies && about.studies.trim().length > 0)) && (
+            <div className="text-sm text-gray-500 space-y-1 mb-4">
+              {about?.languages && about.languages.trim().length > 0 && (
+                <p>
+                  <span className="font-medium">Languages:</span>{" "}
+                  {about.languages}
+                </p>
+              )}
+              {about?.studies && about.studies.trim().length > 0 && (
+                <p>
+                  <span className="font-medium">Studies:</span>{" "}
+                  {about.studies}
+                </p>
+              )}
+            </div>
+          )}
           {introParagraphs.map((paragraph) => (
             <p
               key={paragraph}
@@ -145,51 +210,60 @@ export function About() {
       </div>
 
       {/* Experience */}
-      <section className="mb-20">
-        <h2 className="text-3xl mb-8">Experience</h2>
-        <div className="space-y-8">
-          {experience.map((job, index) => (
-            <div key={`${job.role}-${job.company}-${index}`} className="border-l-2 border-gray-200 pl-6">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                <h3 className="text-xl">{job.role}</h3>
-                <span className="text-gray-500">{job.period}</span>
+      {hasExperience && (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">Experience</h2>
+          <div className="space-y-8">
+            {experience.map((job, index) => (
+              <div
+                key={`${job.role}-${job.company}-${index}`}
+                className="border-l-2 border-gray-200 pl-6"
+              >
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+                  <h3 className="text-xl">{job.role}</h3>
+                  <span className="text-gray-500">{job.period}</span>
+                </div>
+                <p className="text-gray-600 mb-2">{job.company}</p>
+                <p className="text-gray-600">{job.description}</p>
               </div>
-              <p className="text-gray-600 mb-2">{job.company}</p>
-              <p className="text-gray-600">{job.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Skills */}
-      <section className="mb-20">
-        <h2 className="text-3xl mb-8">Skills</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {skills.map((skill) => (
-            <div
-              key={skill}
-              className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
-            >
-              {skill}
-            </div>
-          ))}
-        </div>
-      </section>
+      {hasSkills && (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">Skills</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {skills.map((skill) => (
+              <div
+                key={skill}
+                className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+              >
+                {skill}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Tools */}
-      <section className="mb-20">
-        <h2 className="text-3xl mb-8">Tools</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {tools.map((tool) => (
-            <div
-              key={tool}
-              className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
-            >
-              {tool}
-            </div>
-          ))}
-        </div>
-      </section>
+      {hasTools && (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">Tools</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {tools.map((tool) => (
+              <div
+                key={tool}
+                className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+              >
+                {tool}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Contact & Availability */}
       <section className="mt-20 border-t border-gray-200 pt-10">

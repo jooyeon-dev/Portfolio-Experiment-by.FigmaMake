@@ -133,6 +133,7 @@ type AboutInfo = {
   id: string | null;
   photo_url: string;
   intro_text: string;
+  intro_subtitle: string;
   resume_url: string;
   based_in: string;
   languages: string;
@@ -220,6 +221,7 @@ const DEFAULT_ABOUT: AboutInfo = {
   id: null,
   photo_url: "",
   intro_text: "",
+  intro_subtitle: "",
   resume_url: "",
   based_in: "",
   languages: "",
@@ -406,6 +408,7 @@ export function Admin() {
           id: row.id,
           photo_url: row.photo_url ?? "",
           intro_text: row.intro_text ?? "",
+          intro_subtitle: row.intro_subtitle ?? "",
           resume_url: row.resume_url ?? "",
           based_in: row.based_in ?? "",
           languages: row.languages ?? "",
@@ -2367,6 +2370,21 @@ export function Admin() {
                         intro_text: e.target.value,
                       }))
                     }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium mb-1 block">
+                    Page subtitle
+                  </label>
+                  <Input
+                    value={aboutInfo.intro_subtitle}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        intro_subtitle: e.target.value,
+                      }))
+                    }
+                    placeholder="Passionate about creating intuitive and delightful user experiences"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

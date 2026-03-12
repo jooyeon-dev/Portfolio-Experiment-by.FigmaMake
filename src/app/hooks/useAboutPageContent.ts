@@ -11,7 +11,11 @@ export type AboutExperienceItem = {
 export type AboutData = {
   photo_url: string | null;
   intro_text: string | null;
+  intro_subtitle: string | null;
   resume_url: string | null;
+  based_in: string | null;
+  languages: string | null;
+  studies: string | null;
   experience: AboutExperienceItem[];
   skills: string[];
   tools: string[];
@@ -43,6 +47,10 @@ export function useAboutPageContent(): UseAboutPageContentResult {
 
     async function load() {
       if (!supabase) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "[useAboutPageContent] Supabase client is not configured, skipping fetch.",
+        );
         setLoading(false);
         return;
       }
@@ -53,6 +61,17 @@ export function useAboutPageContent(): UseAboutPageContentResult {
         supabase.from("about").select("*").limit(1).maybeSingle(),
         supabase.from("site_info").select("*").limit(1).maybeSingle(),
       ]);
+
+      // eslint-disable-next-line no-console
+      console.log("[useAboutPageContent] aboutRes", {
+        error: aboutRes.error,
+        data: aboutRes.data,
+      });
+      // eslint-disable-next-line no-console
+      console.log("[useAboutPageContent] siteRes", {
+        error: siteRes.error,
+        data: siteRes.data,
+      });
 
       if (cancelled) return;
 
@@ -76,7 +95,11 @@ export function useAboutPageContent(): UseAboutPageContentResult {
         setAbout({
           photo_url: row.photo_url ?? null,
           intro_text: row.intro_text ?? null,
+          intro_subtitle: row.intro_subtitle ?? null,
           resume_url: row.resume_url ?? null,
+          based_in: row.based_in ?? null,
+          languages: row.languages ?? null,
+          studies: row.studies ?? null,
           experience: experienceArray,
           skills: skillsArray,
           tools: toolsArray,
