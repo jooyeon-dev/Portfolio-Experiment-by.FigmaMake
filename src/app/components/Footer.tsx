@@ -2,7 +2,15 @@ import { Linkedin, Mail } from "lucide-react";
 import { useSiteInfo } from "../hooks/useSiteInfo";
 
 export function Footer() {
-  const { name, role, contactEmail, linkedinUrl } = useSiteInfo();
+  const {
+    name,
+    role,
+    contactEmail,
+    linkedinUrl,
+    footerDescription,
+    showLinkedin,
+    showEmail,
+  } = useSiteInfo();
 
   return (
     <footer className="bg-gray-50 border-t border-gray-200 mt-24">
@@ -10,7 +18,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="mb-4">{name}</h3>
-            <p className="text-gray-600">{role}</p>
+            <p className="text-gray-600">
+              {footerDescription.trim().length > 0 ? footerDescription : role}
+            </p>
           </div>
 
           <div>
@@ -32,29 +42,31 @@ export function Footer() {
           <div>
             <h3 className="mb-4">Connect</h3>
             <div className="flex gap-4">
-              <a
-                href={linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={20} />
-              </a>
-              <a
-                href={`mailto:${contactEmail}`}
-                className="text-gray-600 hover:text-gray-900"
-                aria-label="Email"
-              >
-                <Mail size={20} />
-              </a>
+              {showLinkedin && (
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-gray-900"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={20} />
+                </a>
+              )}
+              {showEmail && (
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="text-gray-600 hover:text-gray-900"
+                  aria-label="Email"
+                >
+                  <Mail size={20} />
+                </a>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600">
-          <p>&copy; 2026 Alex Morgan. All rights reserved.</p>
-        </div>
+        <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600" />
       </div>
     </footer>
   );

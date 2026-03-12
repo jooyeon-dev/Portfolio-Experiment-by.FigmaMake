@@ -6,6 +6,9 @@ export type SiteInfo = {
   role: string;
   contactEmail: string;
   linkedinUrl: string;
+  footerDescription: string;
+  showLinkedin: boolean;
+  showEmail: boolean;
 };
 
 const FALLBACK_SITE_INFO: SiteInfo = {
@@ -13,6 +16,10 @@ const FALLBACK_SITE_INFO: SiteInfo = {
   role: "Product Designer crafting meaningful digital experiences through user-centered design.",
   contactEmail: "alex@example.com",
   linkedinUrl: "https://linkedin.com",
+  footerDescription:
+    "Product Designer crafting meaningful digital experiences through user-centered design.",
+  showLinkedin: true,
+  showEmail: true,
 };
 
 export function useSiteInfo(): SiteInfo {
@@ -26,7 +33,9 @@ export function useSiteInfo(): SiteInfo {
 
       const { data, error } = await supabase
         .from("site_info")
-        .select("name, role, contact_email, linkedin_url")
+        .select(
+          "name, role, contact_email, linkedin_url, footer_description, footer_show_linkedin, footer_show_email",
+        )
         .limit(1)
         .maybeSingle();
 
@@ -41,6 +50,17 @@ export function useSiteInfo(): SiteInfo {
         linkedinUrl:
           (data.linkedin_url as string | null) ||
           FALLBACK_SITE_INFO.linkedinUrl,
+        footerDescription:
+          (data.footer_description as string | null) ??
+          FALLBACK_SITE_INFO.footerDescription,
+        showLinkedin:
+          typeof data.footer_show_linkedin === "boolean"
+            ? data.footer_show_linkedin
+            : FALLBACK_SITE_INFO.showLinkedin,
+        showEmail:
+          typeof data.footer_show_email === "boolean"
+            ? data.footer_show_email
+            : FALLBACK_SITE_INFO.showEmail,
       });
     }
 

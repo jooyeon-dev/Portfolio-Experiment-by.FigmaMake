@@ -15,13 +15,7 @@ import {
 } from "../components/ui/form";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-type AdminTab =
-  | "site"
-  | "how"
-  | "currently"
-  | "projects"
-  | "about"
-  | "values";
+type AdminTab = "home" | "projects" | "about" | "settings";
 
 type MetricInput = {
   value: string;
@@ -109,6 +103,9 @@ type SiteInfo = {
   location: string;
   is_available: boolean;
   availability_text: string;
+  footer_description: string;
+  footer_show_linkedin: boolean;
+  footer_show_email: boolean;
   hero_headline: string;
   hero_description: string;
   hero_cta_primary: string;
@@ -206,6 +203,9 @@ const DEFAULT_SITE_INFO: SiteInfo = {
   location: "",
   is_available: true,
   availability_text: "",
+  footer_description: "",
+  footer_show_linkedin: true,
+  footer_show_email: true,
   hero_headline: "",
   hero_description: "",
   hero_cta_primary: "",
@@ -243,7 +243,7 @@ export function Admin() {
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<AdminTab>("projects");
+  const [activeTab, setActiveTab] = useState<AdminTab>("home");
 
   const [siteInfo, setSiteInfo] = useState<SiteInfo>(DEFAULT_SITE_INFO);
   const [siteSaving, setSiteSaving] = useState(false);
@@ -338,6 +338,15 @@ export function Admin() {
           is_available:
             typeof row.is_available === "boolean" ? row.is_available : true,
           availability_text: row.availability_text ?? "",
+          footer_description: row.footer_description ?? "",
+          footer_show_linkedin:
+            typeof row.footer_show_linkedin === "boolean"
+              ? row.footer_show_linkedin
+              : true,
+          footer_show_email:
+            typeof row.footer_show_email === "boolean"
+              ? row.footer_show_email
+              : true,
           hero_headline: row.hero_headline ?? "",
           hero_description: row.hero_description ?? "",
           hero_cta_primary: row.hero_cta_primary ?? "",
@@ -1004,12 +1013,10 @@ export function Admin() {
 
       <div className="mb-8 flex flex-wrap gap-2 border-b border-gray-200 pb-3">
         {[
-          { id: "site", label: "사이트 기본 정보" },
-          { id: "how", label: "How I Work" },
-          { id: "currently", label: "Currently" },
-          { id: "projects", label: "프로젝트 관리" },
+          { id: "home", label: "Home" },
+          { id: "projects", label: "Projects" },
           { id: "about", label: "About" },
-          { id: "values", label: "Values" },
+          { id: "settings", label: "Settings" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -1035,257 +1042,236 @@ export function Admin() {
         </div>
       )}
 
-      {/* 1. site_info */}
-      {activeTab === "site" && (
-        <form
-          className="max-w-3xl space-y-6"
-          onSubmit={handleSaveSiteInfo}
-          autoComplete="off"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Name</label>
-              <Input
-                value={siteInfo.name}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({ ...prev, name: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Role</label>
-              <Input
-                value={siteInfo.role}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({ ...prev, role: e.target.value }))
-                }
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Location
-              </label>
-              <Input
-                value={siteInfo.location}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    location: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Contact email
-              </label>
-              <Input
-                type="email"
-                value={siteInfo.contact_email}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    contact_email: e.target.value,
-                  }))
-                }
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 items-start">
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                id="is_available"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
-                checked={siteInfo.is_available}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    is_available: e.target.checked,
-                  }))
-                }
-              />
-              <label
-                htmlFor="is_available"
-                className="text-sm font-medium text-gray-700 select-none"
+      {/* 1. Home tab: Hero + How I Work + Currently + Values */}
+      {activeTab === "home" && (
+        <div className="space-y-10">
+          {/* Hero section */}
+          <form
+            className="space-y-6 max-w-3xl border border-gray-200 rounded-xl p-5 bg-white"
+            onSubmit={handleSaveSiteInfo}
+            autoComplete="off"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-medium">Hero</h2>
+                <p className="text-xs text-gray-500">
+                  Headline, description, and primary calls to action on the
+                  home page.
+                </p>
+              </div>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={siteSaving || disabledBecauseNoSupabase}
               >
-                Currently available
-              </label>
+                Save hero
+              </Button>
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Availability text
-              </label>
-              <Textarea
-                rows={2}
-                value={siteInfo.availability_text}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    availability_text: e.target.value,
-                  }))
-                }
-                placeholder="e.g. Currently open to junior product design opportunities."
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium mb-1 block">
-              Hero headline
-            </label>
-            <Input
-              value={siteInfo.hero_headline}
-              onChange={(e) =>
-                setSiteInfo((prev) => ({
-                  ...prev,
-                  hero_headline: e.target.value,
-                }))
-              }
-            />
-          </div>
+            <div className="space-y-4 pt-4 border-t border-gray-200">
+              <div className="space-y-2">
+                <label className="text-sm font-medium mb-1 block">
+                  Hero headline
+                </label>
+                <Input
+                  value={siteInfo.hero_headline}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      hero_headline: e.target.value,
+                    }))
+                  }
+                  placeholder="Product Designer crafting meaningful digital experiences"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium mb-1 block">
-              Hero description
-            </label>
-            <Textarea
-              rows={4}
-              value={siteInfo.hero_description}
-              onChange={(e) =>
-                setSiteInfo((prev) => ({
-                  ...prev,
-                  hero_description: e.target.value,
-                }))
-              }
-            />
-          </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium mb-1 block">
+                  Hero description
+                </label>
+                <Textarea
+                  rows={4}
+                  value={siteInfo.hero_description}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      hero_description: e.target.value,
+                    }))
+                  }
+                  placeholder="Short paragraph about what you do and how you work."
+                />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Primary CTA label
-              </label>
-              <Input
-                value={siteInfo.hero_cta_primary}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    hero_cta_primary: e.target.value,
-                  }))
-                }
-                placeholder="View my work"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Primary CTA label
+                  </label>
+                  <Input
+                    value={siteInfo.hero_cta_primary}
+                    onChange={(e) =>
+                      setSiteInfo((prev) => ({
+                        ...prev,
+                        hero_cta_primary: e.target.value,
+                      }))
+                    }
+                    placeholder="View my work"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Secondary CTA label
+                  </label>
+                  <Input
+                    value={siteInfo.hero_cta_secondary}
+                    onChange={(e) =>
+                      setSiteInfo((prev) => ({
+                        ...prev,
+                        hero_cta_secondary: e.target.value,
+                      }))
+                    }
+                    placeholder="Get in touch"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Secondary CTA label
-              </label>
-              <Input
-                value={siteInfo.hero_cta_secondary}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    hero_cta_secondary: e.target.value,
-                  }))
-                }
-                placeholder="Get in touch"
-              />
-            </div>
-          </div>
+          </form>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                LinkedIn URL
-              </label>
-              <Input
-                value={siteInfo.linkedin_url}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    linkedin_url: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                GitHub URL
-              </label>
-              <Input
-                value={siteInfo.github_url}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    github_url: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                Dribbble URL
-              </label>
-              <Input
-                value={siteInfo.dribbble_url}
-                onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    dribbble_url: e.target.value,
-                  }))
-                }
-              />
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-gray-200">
-            <Button
-              type="submit"
-              size="sm"
-              disabled={siteSaving || disabledBecauseNoSupabase}
-            >
-              Save site info
-            </Button>
-          </div>
-        </form>
-      )}
-
-      {/* 2. how_i_work */}
-      {activeTab === "how" && (
-        <div className="space-y-6 max-w-3xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">How I Work</h2>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleAddHowItem}
-            >
-              <Plus className="w-4 h-4" />
-              Add item
-            </Button>
-          </div>
-          <div className="space-y-4">
-            {howItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-lg p-4 space-y-2 bg-white"
+          {/* How I Work */}
+          <div className="space-y-6 max-w-3xl border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-medium">How I Work</h2>
+                <p className="text-xs text-gray-500">
+                  Outline your process in a few clear steps.
+                </p>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleAddHowItem}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs text-gray-500">
-                    Order {index + 1}
-                  </p>
-                  <div className="flex items-center gap-1">
+                <Plus className="w-4 h-4" />
+                Add item
+              </Button>
+            </div>
+            <div className="space-y-4 pt-4 border-t border-gray-200">
+              {howItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-4 space-y-2 bg-white"
+                >
+                  <div className="flex items-center justify_between gap-2">
+                    <p className="text-xs text-gray-500">
+                      Step {index + 1}
+                    </p>
+                    <div className="flex items-center gap-1 ml-auto">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => moveHowItem(index, -1)}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => moveHowItem(index, 1)}
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleRemoveHowItem(item.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <Input
+                    value={item.title}
+                    onChange={(e) =>
+                      setHowItems((prev) =>
+                        prev.map((h) =>
+                          h.id === item.id
+                            ? { ...h, title: e.target.value }
+                            : h,
+                        ),
+                      )
+                    }
+                    placeholder="Title"
+                    className="mb-2"
+                  />
+                  <Textarea
+                    rows={3}
+                    value={item.description}
+                    onChange={(e) =>
+                      setHowItems((prev) =>
+                        prev.map((h) =>
+                          h.id === item.id
+                            ? { ...h, description: e.target.value }
+                            : h,
+                        ),
+                      )
+                    }
+                    placeholder="Description"
+                  />
+                </div>
+              ))}
+              {howItems.length === 0 && (
+                <p className="text-sm text-gray-500">
+                  No items yet. Add how you work, step by step.
+                </p>
+              )}
+            </div>
+            <div className="pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSaveHow}
+                disabled={howSaving || disabledBecauseNoSupabase}
+              >
+                Save How I Work
+              </Button>
+            </div>
+          </div>
+
+          {/* Currently */}
+          <div className="space-y-6 max-w-3xl border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-medium">Currently</h2>
+                <p className="text-xs text-gray-500">
+                  What you&apos;re currently working on, reading, or exploring.
+                </p>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleAddCurrentItem}
+              >
+                <Plus className="w-4 h-4" />
+                Add item
+              </Button>
+            </div>
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              {currentItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-3 flex items-center gap-3 bg-white"
+                >
+                  <div className="flex flex-col gap-1">
                     <Button
                       type="button"
                       size="icon"
                       variant="ghost"
-                      onClick={() => moveHowItem(index, -1)}
+                      onClick={() => moveCurrentItem(index, -1)}
                     >
                       ↑
                     </Button>
@@ -1293,148 +1279,174 @@ export function Admin() {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      onClick={() => moveHowItem(index, 1)}
+                      onClick={() => moveCurrentItem(index, 1)}
                     >
                       ↓
                     </Button>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleRemoveHowItem(item.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
+                  <Input
+                    value={item.item}
+                    onChange={(e) =>
+                      setCurrentItems((prev) =>
+                        prev.map((c) =>
+                          c.id === item.id
+                            ? { ...c, item: e.target.value }
+                            : c,
+                        ),
+                      )
+                    }
+                    placeholder="Currently..."
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleRemoveCurrentItem(item.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
-                <Input
-                  value={item.title}
-                  onChange={(e) =>
-                    setHowItems((prev) =>
-                      prev.map((h) =>
-                        h.id === item.id ? { ...h, title: e.target.value } : h,
-                      ),
-                    )
-                  }
-                  placeholder="Title"
-                  className="mb-2"
-                />
-                <Textarea
-                  rows={3}
-                  value={item.description}
-                  onChange={(e) =>
-                    setHowItems((prev) =>
-                      prev.map((h) =>
-                        h.id === item.id
-                          ? { ...h, description: e.target.value }
-                          : h,
-                      ),
-                    )
-                  }
-                  placeholder="Description"
-                />
-              </div>
-            ))}
-            {howItems.length === 0 && (
-              <p className="text-sm text-gray-500">
-                No items yet. Add how you work, step by step.
-              </p>
-            )}
-          </div>
-          <div className="pt-4 border-t border-gray-200">
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSaveHow}
-              disabled={howSaving || disabledBecauseNoSupabase}
-            >
-              Save How I Work
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* 3. currently */}
-      {activeTab === "currently" && (
-        <div className="space-y-6 max-w-3xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Currently</h2>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleAddCurrentItem}
-            >
-              <Plus className="w-4 h-4" />
-              Add item
-            </Button>
-          </div>
-          <div className="space-y-3">
-            {currentItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-lg p-3 flex items-center gap-3 bg-white"
+              ))}
+              {currentItems.length === 0 && (
+                <p className="text-sm text-gray-500">
+                  Add what you&apos;re currently working on, reading, exploring,
+                  etc.
+                </p>
+              )}
+            </div>
+            <div className="pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSaveCurrent}
+                disabled={currentSaving || disabledBecauseNoSupabase}
               >
-                <div className="flex flex-col gap-1">
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => moveCurrentItem(index, -1)}
-                  >
-                    ↑
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => moveCurrentItem(index, 1)}
-                  >
-                    ↓
-                  </Button>
-                </div>
-                <Input
-                  value={item.item}
-                  onChange={(e) =>
-                    setCurrentItems((prev) =>
-                      prev.map((c) =>
-                        c.id === item.id ? { ...c, item: e.target.value } : c,
-                      ),
-                    )
-                  }
-                  placeholder="Currently..."
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => handleRemoveCurrentItem(item.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-            {currentItems.length === 0 && (
-              <p className="text-sm text-gray-500">
-                Add what you&apos;re currently working on, reading, exploring,
-                etc.
-              </p>
-            )}
+                Save Currently
+              </Button>
+            </div>
           </div>
-          <div className="pt-4 border-t border-gray-200">
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSaveCurrent}
-              disabled={currentSaving || disabledBecauseNoSupabase}
-            >
-              Save Currently
-            </Button>
+
+          {/* Principles & Values */}
+          <div className="space-y-6 max-w-3xl border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-medium">Principles &amp; Values</h2>
+                <p className="text-xs text-gray-500">
+                  The principles that guide how you design and work.
+                </p>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleAddValue}
+              >
+                <Plus className="w-4 h-4" />
+                Add value
+              </Button>
+            </div>
+            <div className="space-y-4 pt-4 border-t border-gray-200">
+              {valuesItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-4 space-y-2 bg-white"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-500">
+                      #{index + 1} Value
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => moveValue(index, -1)}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => moveValue(index, 1)}
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleRemoveValue(item.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[minmax(0,0.4fr)_minmax(0,2fr)] gap-3">
+                    <Input
+                      value={item.number}
+                      onChange={(e) =>
+                        setValuesItems((prev) =>
+                          prev.map((v) =>
+                            v.id === item.id
+                              ? { ...v, number: e.target.value }
+                              : v,
+                          ),
+                        )
+                      }
+                      placeholder="01"
+                    />
+                    <Input
+                      value={item.title}
+                      onChange={(e) =>
+                        setValuesItems((prev) =>
+                          prev.map((v) =>
+                            v.id === item.id
+                              ? { ...v, title: e.target.value }
+                              : v,
+                          ),
+                        )
+                      }
+                      placeholder="Value title"
+                    />
+                  </div>
+                  <Textarea
+                    rows={3}
+                    value={item.description}
+                    onChange={(e) =>
+                      setValuesItems((prev) =>
+                        prev.map((v) =>
+                          v.id === item.id
+                            ? { ...v, description: e.target.value }
+                            : v,
+                        ),
+                      )
+                    }
+                    placeholder="Description"
+                  />
+                </div>
+              ))}
+              {valuesItems.length === 0 && (
+                <p className="text-sm text-gray-500">
+                  No values yet. Add the principles that matter most to you.
+                </p>
+              )}
+            </div>
+            <div className="pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSaveValues}
+                disabled={valuesSaving || disabledBecauseNoSupabase}
+              >
+                Save values
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 4. projects (case study) */}
+      {/* 2. Projects (case study) */}
       {activeTab === "projects" && (
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,2fr)] gap-10 items-start">
           {/* Left: list */}
@@ -2325,63 +2337,68 @@ export function Admin() {
         </div>
       )}
 
-      {/* 5. About */}
+      {/* 3. About */}
       {activeTab === "about" && (
         <form
-          className="space-y-6 max-w-4xl"
+          className="space-y-8 max-w-4xl"
           onSubmit={handleSaveAbout}
           autoComplete="off"
         >
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6 items-start">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium mb-1 block">
-                  Intro text
-                </label>
-                <Textarea
-                  rows={4}
-                  value={aboutInfo.intro_text}
-                  onChange={(e) =>
-                    setAboutInfo((prev) => ({
-                      ...prev,
-                      intro_text: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+          {/* Profile */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">Profile</h2>
+              <p className="text-xs text-gray-500">
+                Photo, short introduction, and resume file.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6 items-start pt-4 border-t border-gray-200">
+              <div className="space-y-4">
+                <div className="space-y-2">
                   <label className="text-sm font-medium mb-1 block">
-                    Based in
+                    Intro text
                   </label>
-                  <Input
-                    value={aboutInfo.based_in}
+                  <Textarea
+                    rows={4}
+                    value={aboutInfo.intro_text}
                     onChange={(e) =>
                       setAboutInfo((prev) => ({
                         ...prev,
-                        based_in: e.target.value,
+                        intro_text: e.target.value,
                       }))
                     }
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">
-                    Languages
-                  </label>
-                  <Input
-                    value={aboutInfo.languages}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        languages: e.target.value,
-                      }))
-                    }
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">
+                      Based in
+                    </label>
+                    <Input
+                      value={aboutInfo.based_in}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          based_in: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">
+                      Languages
+                    </label>
+                    <Input
+                      value={aboutInfo.languages}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          languages: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1 block">
                     Studies
@@ -2397,247 +2414,177 @@ export function Admin() {
                     }
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">
-                    Off the clock
-                  </label>
-                  <Textarea
-                    rows={3}
-                    value={aboutInfo.off_the_clock}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        off_the_clock: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="space-y-4">
+                <div className="space-y-2">
                   <label className="text-sm font-medium mb-1 block">
-                    Also me
+                    Photo
                   </label>
-                  <Textarea
-                    rows={3}
-                    value={aboutInfo.also_me}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        also_me: e.target.value,
-                      }))
-                    }
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadAboutPhoto}
+                    disabled={disabledBecauseNoSupabase}
                   />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">
-                    Current obsession
-                  </label>
-                  <Textarea
-                    rows={3}
-                    value={aboutInfo.current_obsession}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        current_obsession: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium mb-1 block">
-                  Photo
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleUploadAboutPhoto}
-                  disabled={disabledBecauseNoSupabase}
-                />
-                {aboutInfo.photo_url && (
-                  <div className="mt-3 w-full max-w-xs">
-                    <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100">
-                      <ImageWithFallback
-                        src={aboutInfo.photo_url}
-                        alt="About photo"
-                        className="w-full h-full object-cover"
-                      />
+                  {aboutInfo.photo_url && (
+                    <div className="mt-3 w-full max-w-xs">
+                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100">
+                        <ImageWithFallback
+                          src={aboutInfo.photo_url}
+                          alt="About photo"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium mb-1 block">
-                  Resume file
-                </label>
-                <input
-                  type="file"
-                  onChange={handleUploadResume}
-                  disabled={disabledBecauseNoSupabase}
-                />
-                {aboutInfo.resume_url && (
-                  <p className="text-xs text-gray-600 mt-1 break-all">
-                    {aboutInfo.resume_url}
-                  </p>
-                )}
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium mb-1 block">
+                    Resume file
+                  </label>
+                  <input
+                    type="file"
+                    onChange={handleUploadResume}
+                    disabled={disabledBecauseNoSupabase}
+                  />
+                  {aboutInfo.resume_url && (
+                    <p className="text-xs text-gray-600 mt-1 break-all">
+                      {aboutInfo.resume_url}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            {/* Experience list */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Experience</h3>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setAboutInfo((prev) => ({
-                      ...prev,
-                      experience: [
-                        ...prev.experience,
-                        {
-                          role: "",
-                          company: "",
-                          period: "",
-                          description: "",
-                        },
-                      ],
-                    }))
-                  }
+          {/* Experience */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">Experience</h2>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setAboutInfo((prev) => ({
+                    ...prev,
+                    experience: [
+                      ...prev.experience,
+                      {
+                        role: "",
+                        company: "",
+                        period: "",
+                        description: "",
+                      },
+                    ],
+                  }))
+                }
+              >
+                <Plus className="w-4 h-4" />
+                Add experience
+              </Button>
+            </div>
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              {aboutInfo.experience.map((item, index) => (
+                <div
+                  key={`${item.role}-${item.company}-${index}`}
+                  className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
                 >
-                  <Plus className="w-4 h-4" />
-                  Add experience
-                </Button>
-              </div>
-              <div className="space-y-3">
-                {aboutInfo.experience.map((item, index) => (
-                  <div
-                    key={`${item.role}-${item.company}-${index}`}
-                    className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs text-gray-500">
-                        #{index + 1} Experience
-                      </p>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        onClick={() =>
-                          setAboutInfo((prev) => ({
-                            ...prev,
-                            experience: prev.experience.filter(
-                              (_, i) => i !== index,
-                            ),
-                          }))
-                        }
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <Input
-                        placeholder="Role"
-                        value={item.role}
-                        onChange={(e) =>
-                          setAboutInfo((prev) => ({
-                            ...prev,
-                            experience: prev.experience.map((exp, i) =>
-                              i === index
-                                ? { ...exp, role: e.target.value }
-                                : exp,
-                            ),
-                          }))
-                        }
-                      />
-                      <Input
-                        placeholder="Company"
-                        value={item.company}
-                        onChange={(e) =>
-                          setAboutInfo((prev) => ({
-                            ...prev,
-                            experience: prev.experience.map((exp, i) =>
-                              i === index
-                                ? { ...exp, company: e.target.value }
-                                : exp,
-                            ),
-                          }))
-                        }
-                      />
-                    </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-500">
+                      #{index + 1} Experience
+                    </p>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          experience: prev.experience.filter(
+                            (_, i) => i !== index,
+                          ),
+                        }))
+                      }
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <Input
-                      placeholder="Period"
-                      value={item.period}
+                      placeholder="Role"
+                      value={item.role}
                       onChange={(e) =>
                         setAboutInfo((prev) => ({
                           ...prev,
                           experience: prev.experience.map((exp, i) =>
                             i === index
-                              ? { ...exp, period: e.target.value }
+                              ? { ...exp, role: e.target.value }
                               : exp,
                           ),
                         }))
                       }
                     />
-                    <Textarea
-                      rows={3}
-                      placeholder="Description"
-                      value={item.description}
+                    <Input
+                      placeholder="Company"
+                      value={item.company}
                       onChange={(e) =>
                         setAboutInfo((prev) => ({
                           ...prev,
                           experience: prev.experience.map((exp, i) =>
                             i === index
-                              ? { ...exp, description: e.target.value }
+                              ? { ...exp, company: e.target.value }
                               : exp,
                           ),
                         }))
                       }
                     />
                   </div>
-                ))}
-                {aboutInfo.experience.length === 0 && (
-                  <p className="text-xs text-gray-500">
-                    No experience items yet. Add your roles and responsibilities
-                    here.
-                  </p>
-                )}
-              </div>
+                  <Input
+                    placeholder="Period"
+                    value={item.period}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        experience: prev.experience.map((exp, i) =>
+                          i === index
+                            ? { ...exp, period: e.target.value }
+                            : exp,
+                        ),
+                      }))
+                    }
+                  />
+                  <Textarea
+                    rows={3}
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        experience: prev.experience.map((exp, i) =>
+                          i === index
+                            ? { ...exp, description: e.target.value }
+                            : exp,
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+              {aboutInfo.experience.length === 0 && (
+                <p className="text-xs text-gray-500">
+                  No experience items yet. Add your roles and responsibilities
+                  here.
+                </p>
+              )}
             </div>
+          </div>
 
-            {/* Colleague tags */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium mb-1 block">
-                Colleague tags
-              </label>
-              <Textarea
-                rows={2}
-                value={aboutInfo.colleague_tags.join(", ")}
-                onChange={(e) =>
-                  setAboutInfo((prev) => ({
-                    ...prev,
-                    colleague_tags: e.target.value
-                      .split(",")
-                      .map((v) => v.trim())
-                      .filter(Boolean),
-                  }))
-                }
-                placeholder="Comma-separated, e.g. Reliable, System thinker, Calm under pressure"
-              />
-            </div>
-
-            {/* Skills / tools */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+          {/* Skills & Tools */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Skills &amp; Tools</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+              <div className="space-y-2">
                 <label className="text-sm font-medium mb-1 block">
                   Skills
                 </label>
@@ -2656,7 +2603,7 @@ export function Admin() {
                   placeholder="Comma-separated list"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium mb-1 block">
                   Tools
                 </label>
@@ -2676,6 +2623,81 @@ export function Admin() {
                 />
               </div>
             </div>
+
+            <div className="space-y-2 pt-4 border-t border-gray-200">
+              <label className="text-sm font-medium mb-1 block">
+                Colleague tags
+              </label>
+              <Textarea
+                rows={2}
+                value={aboutInfo.colleague_tags.join(", ")}
+                onChange={(e) =>
+                  setAboutInfo((prev) => ({
+                    ...prev,
+                    colleague_tags: e.target.value
+                      .split(",")
+                      .map((v) => v.trim())
+                      .filter(Boolean),
+                  }))
+                }
+                placeholder="Comma-separated, e.g. Reliable, System thinker, Calm under pressure"
+              />
+            </div>
+          </div>
+
+          {/* Beyond the Portfolio */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Beyond the Portfolio</h2>
+            <p className="text-xs text-gray-500">
+              Details that make you more than just your case studies.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Off the clock
+                </label>
+                <Textarea
+                  rows={3}
+                  value={aboutInfo.off_the_clock}
+                  onChange={(e) =>
+                    setAboutInfo((prev) => ({
+                      ...prev,
+                      off_the_clock: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Also me
+                </label>
+                <Textarea
+                  rows={3}
+                  value={aboutInfo.also_me}
+                  onChange={(e) =>
+                    setAboutInfo((prev) => ({
+                      ...prev,
+                      also_me: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Current obsession
+              </label>
+              <Textarea
+                rows={3}
+                value={aboutInfo.current_obsession}
+                onChange={(e) =>
+                  setAboutInfo((prev) => ({
+                    ...prev,
+                    current_obsession: e.target.value,
+                  }))
+                }
+              />
+            </div>
           </div>
 
           <div className="pt-4 border-t border-gray-200">
@@ -2690,116 +2712,225 @@ export function Admin() {
         </form>
       )}
 
-      {/* 6. Values */}
-      {activeTab === "values" && (
-        <div className="space-y-6 max-w-3xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Values</h2>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleAddValue}
-            >
-              <Plus className="w-4 h-4" />
-              Add value
-            </Button>
-          </div>
-          <div className="space-y-4">
-            {valuesItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={item.number}
-                      onChange={(e) =>
-                        setValuesItems((prev) =>
-                          prev.map((v) =>
-                            v.id === item.id
-                              ? { ...v, number: e.target.value }
-                              : v,
-                          ),
-                        )
-                      }
-                      className="w-16"
-                    />
-                    <Input
-                      value={item.title}
-                      onChange={(e) =>
-                        setValuesItems((prev) =>
-                          prev.map((v) =>
-                            v.id === item.id
-                              ? { ...v, title: e.target.value }
-                              : v,
-                          ),
-                        )
-                      }
-                      placeholder="Title"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => moveValue(index, -1)}
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => moveValue(index, 1)}
-                    >
-                      ↓
-                    </Button>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleRemoveValue(item.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-                <Textarea
-                  rows={3}
-                  value={item.description}
+      {/* 4. Settings */}
+      {activeTab === "settings" && (
+        <form
+          className="space-y-8 max-w-3xl"
+          onSubmit={handleSaveSiteInfo}
+          autoComplete="off"
+        >
+          {/* Profile */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Profile</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Name</label>
+                <Input
+                  value={siteInfo.name}
                   onChange={(e) =>
-                    setValuesItems((prev) =>
-                      prev.map((v) =>
-                        v.id === item.id
-                          ? { ...v, description: e.target.value }
-                          : v,
-                      ),
-                    )
+                    setSiteInfo((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="Description"
                 />
               </div>
-            ))}
-            {valuesItems.length === 0 && (
-              <p className="text-sm text-gray-500">
-                Add values that describe how you work and make decisions.
-              </p>
-            )}
+              <div>
+                <label className="text-sm font-medium mb-1 block">Role</label>
+                <Input
+                  value={siteInfo.role}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({ ...prev, role: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Location</label>
+              <Input
+                value={siteInfo.location}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
+              />
+            </div>
           </div>
+
+          {/* Contact */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Contact</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Contact email
+                </label>
+                <Input
+                  type="email"
+                  value={siteInfo.contact_email}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      contact_email: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  LinkedIn URL
+                </label>
+                <Input
+                  value={siteInfo.linkedin_url}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      linkedin_url: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Availability */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Availability</h2>
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 items-start pt-2 border-t border-gray-200">
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  id="is_available"
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                  checked={siteInfo.is_available}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      is_available: e.target.checked,
+                    }))
+                  }
+                />
+                <label
+                  htmlFor="is_available"
+                  className="text-sm font-medium text-gray-700 select-none"
+                >
+                  Currently available
+                </label>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Availability text
+                </label>
+                <Textarea
+                  rows={2}
+                  value={siteInfo.availability_text}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      availability_text: e.target.value,
+                    }))
+                  }
+                  placeholder="e.g. Currently open to junior product design opportunities."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Links</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  GitHub URL
+                </label>
+                <Input
+                  value={siteInfo.github_url}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      github_url: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Dribbble URL
+                </label>
+                <Input
+                  value={siteInfo.dribbble_url}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      dribbble_url: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <h2 className="text-lg font-medium">Footer</h2>
+            <div className="space-y-2 pt-2 border-t border-gray-200">
+              <label className="text-sm font-medium mb-1 block">
+                Footer description
+              </label>
+              <Textarea
+                rows={3}
+                value={siteInfo.footer_description}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    footer_description: e.target.value,
+                  }))
+                }
+                placeholder="Short sentence to show in footer. If empty, your role will be used."
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                  checked={siteInfo.footer_show_linkedin}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      footer_show_linkedin: e.target.checked,
+                    }))
+                  }
+                />
+                Show LinkedIn icon
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                  checked={siteInfo.footer_show_email}
+                  onChange={(e) =>
+                    setSiteInfo((prev) => ({
+                      ...prev,
+                      footer_show_email: e.target.checked,
+                    }))
+                  }
+                />
+                Show email icon
+              </label>
+            </div>
+          </div>
+
           <div className="pt-4 border-t border-gray-200">
             <Button
-              type="button"
+              type="submit"
               size="sm"
-              onClick={handleSaveValues}
-              disabled={valuesSaving || disabledBecauseNoSupabase}
+              disabled={siteSaving || disabledBecauseNoSupabase}
             >
-              Save Values
+              Save settings
             </Button>
           </div>
-        </div>
+        </form>
       )}
     </div>
   );
