@@ -1,32 +1,36 @@
-import { Download, Mail, MapPin, Linkedin as LinkedinIcon } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { Download, Mail, MapPin, Linkedin as LinkedinIcon } from "lucide-react";
 import { useAboutPageContent } from "../hooks/useAboutPageContent";
 
+const FALLBACK_NAME = "Alex Morgan";
+const FALLBACK_LOCATION = "Seoul, South Korea";
+const FALLBACK_EMAIL = "alex@example.com";
+const FALLBACK_LINKEDIN = "https://linkedin.com";
+const FALLBACK_AVAILABILITY_TEXT = "Currently open to new opportunities.";
 const FALLBACK_PHOTO_URL =
   "https://images.unsplash.com/photo-1767439567636-792a76f6e4b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMHdvbWFuJTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MXx8fHwxNzcyODUwMjEzfDA&ixlib=rb-4.1.0&q=80&w=1080";
-
-const FALLBACK_INTRO = [
+const FALLBACK_INTRO_PARAGRAPHS = [
   "I'm a product designer with over 6 years of experience creating digital products that people love to use. My approach combines user research, strategic thinking, and visual design to solve complex problems.",
   "I believe great design is invisible—it just works. I'm passionate about accessibility, design systems, and mentoring junior designers. When I'm not designing, you can find me hiking, photography, or exploring new coffee shops.",
 ];
 
 const FALLBACK_EXPERIENCE = [
   {
-    role: "Senior Product Designer",
+    title: "Senior Product Designer",
     company: "Tech Innovators Inc.",
     period: "2023 - Present",
     description:
       "Leading design initiatives for B2B SaaS platform, managing end-to-end product design from research to delivery.",
   },
   {
-    role: "Product Designer",
+    title: "Product Designer",
     company: "Digital Solutions Co.",
     period: "2021 - 2023",
     description:
       "Designed mobile and web applications for various clients across fintech, e-commerce, and healthcare industries.",
   },
   {
-    role: "UX Designer",
+    title: "UX Designer",
     company: "Creative Agency",
     period: "2019 - 2021",
     description:
@@ -60,103 +64,117 @@ const FALLBACK_TOOLS = [
   "Jira",
 ];
 
-const FALLBACK_NAME = "Alex Morgan";
-const FALLBACK_ROLE =
-  "Product Designer crafting meaningful digital experiences";
-const FALLBACK_LOCATION = "Based in San Francisco, CA";
-const FALLBACK_EMAIL = "alex@example.com";
-const FALLBACK_LINKEDIN = "https://linkedin.com";
-const FALLBACK_AVAILABILITY_TEXT =
-  "Currently open to new junior product design opportunities.";
-
 export function About() {
-  const { about, siteInfo, loading } = useAboutPageContent();
+  const { about, siteInfo } = useAboutPageContent();
 
   const name = siteInfo?.name?.trim() || FALLBACK_NAME;
-  const basedIn =
-    about?.based_in && about.based_in.trim().length > 0
-      ? about.based_in.trim()
-      : null;
   const location =
-    basedIn ||
-    (siteInfo?.location && siteInfo.location.trim().length > 0
-      ? siteInfo.location.trim()
-      : FALLBACK_LOCATION);
-  const role = siteInfo?.role?.trim() || FALLBACK_ROLE;
-  const email = siteInfo?.contact_email?.trim() || FALLBACK_EMAIL;
-  const linkedinUrl = siteInfo?.linkedin_url?.trim() || FALLBACK_LINKEDIN;
+    (siteInfo?.location && siteInfo.location.trim()) || FALLBACK_LOCATION;
+  const email =
+    (siteInfo?.contact_email && siteInfo.contact_email.trim()) ||
+    FALLBACK_EMAIL;
+  const linkedinUrl =
+    (siteInfo?.linkedin_url && siteInfo.linkedin_url.trim()) ||
+    FALLBACK_LINKEDIN;
   const isAvailable =
     siteInfo?.is_available == null ? true : Boolean(siteInfo.is_available);
   const availabilityText =
-    siteInfo?.availability_text?.trim() || FALLBACK_AVAILABILITY_TEXT;
+    (siteInfo?.availability_text &&
+      siteInfo.availability_text.trim().length > 0 &&
+      siteInfo.availability_text.trim()) ||
+    FALLBACK_AVAILABILITY_TEXT;
 
   const photoUrl = about?.photo_url || FALLBACK_PHOTO_URL;
+
   const introText =
     about?.intro_text && about.intro_text.trim().length > 0
       ? about.intro_text.trim()
       : "";
   const introParagraphs =
-    introText.length > 0 ? introText.split("\n\n") : [];
-  const resumeUrl = about?.resume_url || null;
+    introText.length > 0
+      ? introText.split("\n\n")
+      : FALLBACK_INTRO_PARAGRAPHS;
 
-  const experience = about?.experience ?? [];
-  const skills = about?.skills ?? [];
-  const tools = about?.tools ?? [];
+  const experienceFromSupabase = Array.isArray(about?.experience)
+    ? about.experience
+    : [];
+  const experience =
+    experienceFromSupabase.length > 0
+      ? experienceFromSupabase.map((item: any) => ({
+          title: String(item.role ?? ""),
+          company: String(item.company ?? ""),
+          period: String(item.period ?? ""),
+          description: String(item.description ?? ""),
+        }))
+      : FALLBACK_EXPERIENCE;
 
-  const hasExperience = experience.length > 0;
-  const hasSkills = skills.length > 0;
-  const hasTools = tools.length > 0;
+  const skillsFromSupabase = Array.isArray(about?.skills)
+    ? about.skills
+    : [];
+  const skills =
+    skillsFromSupabase.length > 0 ? skillsFromSupabase : FALLBACK_SKILLS;
 
-  const headerTitle = "About Me";
+  const toolsFromSupabase = Array.isArray(about?.tools) ? about.tools : [];
+  const tools =
+    toolsFromSupabase.length > 0 ? toolsFromSupabase : FALLBACK_TOOLS;
+
+  const resumeUrl =
+    about && typeof about.resume_url === "string"
+      ? about.resume_url.trim()
+      : "";
+
   const headerSubtitle =
     (about?.intro_subtitle && about.intro_subtitle.trim().length > 0
       ? about.intro_subtitle.trim()
       : "") ||
     "Passionate about creating intuitive and delightful user experiences";
-  const showHeader =
-    headerTitle.trim().length > 0 || headerSubtitle.trim().length > 0;
 
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="mb-16 animate-pulse">
-          <div className="h-8 md:h-10 bg-gray-200 rounded w-40 mb-3" />
-          <div className="h-5 bg-gray-200 rounded w-72" />
-        </div>
+  const studies =
+    about?.studies && about.studies.trim().length > 0
+      ? about.studies.trim()
+      : "";
+  const basedIn =
+    about?.based_in && about.based_in.trim().length > 0
+      ? about.based_in.trim()
+      : "";
+  const languages =
+    about?.languages && about.languages.trim().length > 0
+      ? about.languages.trim()
+      : "";
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 animate-pulse">
-          <div>
-            <div className="aspect-square rounded-lg bg-gray-200" />
-          </div>
-          <div className="space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-48" />
-            <div className="h-4 bg-gray-200 rounded w-32" />
-            <div className="h-4 bg-gray-200 rounded w-full" />
-            <div className="h-4 bg-gray-200 rounded w-5/6" />
-            <div className="h-10 bg-gray-200 rounded-full w-40" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const hasStudies = studies.length > 0;
+
+  const offTheClock =
+    about?.off_the_clock && about.off_the_clock.trim().length > 0
+      ? about.off_the_clock.trim()
+      : "";
+  const alsoMe =
+    about?.also_me && about.also_me.trim().length > 0
+      ? about.also_me.trim()
+      : "";
+  const currentObsession =
+    about?.current_obsession && about.current_obsession.trim().length > 0
+      ? about.current_obsession.trim()
+      : "";
+
+  const hasMoreAbout =
+    offTheClock.length > 0 ||
+    alsoMe.length > 0 ||
+    currentObsession.length > 0;
+
+  const hasSkills = skills.length > 0;
+  const hasTools = tools.length > 0;
+  const hasSkillsOrTools = hasSkills || hasTools;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       {/* Header */}
-      {showHeader && (
-        <div className="mb-16">
-          {headerTitle.trim().length > 0 && (
-            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-4">
-              {headerTitle}
-            </h1>
-          )}
-          {headerSubtitle.trim().length > 0 && (
-            <p className="text-xl text-gray-600">{headerSubtitle}</p>
-          )}
-        </div>
-      )}
+      <div className="mb-16">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6">About Me</h1>
+        <p className="text-xl text-gray-600">{headerSubtitle}</p>
+      </div>
 
-      {/* Profile Section */}
+      {/* 2. Profile */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
         <div>
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
@@ -168,106 +186,136 @@ export function About() {
           </div>
         </div>
         <div className="flex flex-col justify-center">
-          <h2 className="text-3xl mb-4">Hello, I'm {name}</h2>
-          <p className="text-gray-600 mb-4">{location}</p>
-          {((about?.languages && about.languages.trim().length > 0) ||
-            (about?.studies && about.studies.trim().length > 0)) && (
-            <div className="text-sm text-gray-500 space-y-1 mb-4">
-              {about?.languages && about.languages.trim().length > 0 && (
-                <p>
-                  <span className="font-medium">Languages:</span>{" "}
-                  {about.languages}
-                </p>
-              )}
-              {about?.studies && about.studies.trim().length > 0 && (
-                <p>
-                  <span className="font-medium">Studies:</span>{" "}
-                  {about.studies}
-                </p>
-              )}
-            </div>
-          )}
+          <h2 className="text-3xl mb-6">Hello, I'm {name}</h2>
           {introParagraphs.map((paragraph) => (
             <p
               key={paragraph}
-              className="text-lg text-gray-600 mb-4 leading-relaxed"
+              className="text-lg text-gray-600 mb-6 leading-relaxed last:mb-8"
             >
               {paragraph}
             </p>
           ))}
           {resumeUrl && (
-            <a
-              href={resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() =>
+                window.open(resumeUrl, "_blank", "noopener,noreferrer")
+              }
               className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors self-start"
             >
               <Download size={20} />
               Download Resume
-            </a>
+            </button>
           )}
         </div>
       </div>
 
-      {/* Experience */}
-      {hasExperience && (
+      {/* 3. Education */}
+      {hasStudies && (
         <section className="mb-20">
-          <h2 className="text-3xl mb-8">Experience</h2>
-          <div className="space-y-8">
-            {experience.map((job, index) => (
-              <div
-                key={`${job.role}-${job.company}-${index}`}
-                className="border-l-2 border-gray-200 pl-6"
-              >
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                  <h3 className="text-xl">{job.role}</h3>
-                  <span className="text-gray-500">{job.period}</span>
-                </div>
-                <p className="text-gray-600 mb-2">{job.company}</p>
-                <p className="text-gray-600">{job.description}</p>
+          <h2 className="text-3xl mb-8">Education</h2>
+          <div className="space-y-3 text-gray-700">
+            <p>{studies}</p>
+            {(basedIn || languages) && (
+              <div className="text-sm text-gray-500 space-y-1">
+                {basedIn && (
+                  <p>
+                    <span className="font-medium">Based in:</span> {basedIn}
+                  </p>
+                )}
+                {languages && (
+                  <p>
+                    <span className="font-medium">Languages:</span>{" "}
+                    {languages}
+                  </p>
+                )}
               </div>
-            ))}
+            )}
           </div>
         </section>
       )}
 
-      {/* Skills */}
-      {hasSkills && (
-        <section className="mb-20">
-          <h2 className="text-3xl mb-8">Skills</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {skills.map((skill) => (
-              <div
-                key={skill}
-                className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
-              >
-                {skill}
+      {/* 4. Experience */}
+      <section className="mb-20">
+        <h2 className="text-3xl mb-8">Experience</h2>
+        <div className="space-y-8">
+          {experience.map((job, index) => (
+            <div key={index} className="border-l-2 border-gray-200 pl-6">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+                <h3 className="text-xl">{job.title}</h3>
+                <span className="text-gray-500">{job.period}</span>
               </div>
-            ))}
+              <p className="text-gray-600 mb-2">{job.company}</p>
+              <p className="text-gray-600">{job.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Skills & Tools */}
+      {hasSkillsOrTools && (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">Skills &amp; Tools</h2>
+          {hasSkills && (
+            <div className="mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {skills.map((skill) => (
+                  <div
+                    key={skill}
+                    className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+                  >
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {hasTools && (
+            <div className="pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {tools.map((tool) => (
+                  <div
+                    key={tool}
+                    className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
+                  >
+                    {tool}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 6. A bit more about me */}
+      {hasMoreAbout && (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">A bit more about me</h2>
+          <div className="space-y-4 text-gray-700">
+            {offTheClock && (
+              <p>
+                <span className="font-medium">Off the clock:</span>{" "}
+                {offTheClock}
+              </p>
+            )}
+            {alsoMe && (
+              <p>
+                <span className="font-medium">Also me:</span> {alsoMe}
+              </p>
+            )}
+            {currentObsession && (
+              <p>
+                <span className="font-medium">Current obsession:</span>{" "}
+                {currentObsession}
+              </p>
+            )}
           </div>
         </section>
       )}
 
-      {/* Tools */}
-      {hasTools && (
-        <section className="mb-20">
-          <h2 className="text-3xl mb-8">Tools</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {tools.map((tool) => (
-              <div
-                key={tool}
-                className="p-4 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition-colors"
-              >
-                {tool}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Contact & Availability */}
-      <section className="mt-20 border-t border-gray-200 pt-10">
-        <h2 className="text-2xl mb-6">Let&apos;s connect</h2>
+      {/* 7. Contact & Availability */}
+      <section className="mb-20 border-t border-gray-200 pt-10">
+        <h2 className="text-3xl mb-8">Let&apos;s connect</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex items-start gap-3">
             <Mail className="mt-1 text-gray-500" size={20} />
@@ -316,4 +364,3 @@ export function About() {
     </div>
   );
 }
-

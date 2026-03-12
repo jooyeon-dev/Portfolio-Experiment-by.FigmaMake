@@ -16,6 +16,9 @@ export type AboutData = {
   based_in: string | null;
   languages: string | null;
   studies: string | null;
+  off_the_clock: string | null;
+  also_me: string | null;
+  current_obsession: string | null;
   experience: AboutExperienceItem[];
   skills: string[];
   tools: string[];
@@ -100,6 +103,9 @@ export function useAboutPageContent(): UseAboutPageContentResult {
           based_in: row.based_in ?? null,
           languages: row.languages ?? null,
           studies: row.studies ?? null,
+          off_the_clock: row.off_the_clock ?? null,
+          also_me: row.also_me ?? null,
+          current_obsession: row.current_obsession ?? null,
           experience: experienceArray,
           skills: skillsArray,
           tools: toolsArray,
