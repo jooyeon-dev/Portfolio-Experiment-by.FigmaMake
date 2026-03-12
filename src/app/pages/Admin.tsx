@@ -240,7 +240,24 @@ const DEFAULT_ABOUT: AboutInfo = {
   current_obsession: "",
   colleague_tags: [],
   experience: [],
-  education: [],
+  education: [
+    {
+      school: "Seoul National University",
+      major: "Visual Communication Design",
+      period: "2018 – 2022",
+      location: "Seoul, South Korea",
+      description:
+        "Focused on interaction design, typography, and user-centered design methodology while collaborating on cross-disciplinary projects.",
+    },
+    {
+      school: "Interaction Design Foundation",
+      major: "Human-Computer Interaction (Online Courses)",
+      period: "2022 – Present",
+      location: "Remote",
+      description:
+        "Continuous learning in UX research, information architecture, and service design to deepen product thinking.",
+    },
+  ],
   skills: [],
   tools: [],
 };
@@ -414,6 +431,7 @@ export function Admin() {
 
       if (!aboutRes.error && aboutRes.data) {
         const row = aboutRes.data as any;
+        const educationSrc = row.education as AboutEducationItem[] | null;
         setAboutInfo({
           id: row.id,
           photo_url: row.photo_url ?? "",
@@ -429,13 +447,15 @@ export function Admin() {
           colleague_tags: row.colleague_tags ?? [],
           experience: (row.experience as any[] | null) ?? [],
           education:
-            (row.education as AboutEducationItem[] | null)?.map((item) => ({
-              school: item.school ?? "",
-              major: item.major ?? "",
-              period: item.period ?? "",
-              location: item.location ?? "",
-              description: item.description ?? "",
-            })) ?? [],
+            educationSrc && educationSrc.length > 0
+              ? educationSrc.map((item) => ({
+                  school: item.school ?? "",
+                  major: item.major ?? "",
+                  period: item.period ?? "",
+                  location: item.location ?? "",
+                  description: item.description ?? "",
+                }))
+              : DEFAULT_ABOUT.education,
           skills: row.skills ?? [],
           tools: row.tools ?? [],
         });
@@ -2493,6 +2513,143 @@ export function Admin() {
             </div>
           </div>
 
+          {/* Education */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">Education</h2>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setAboutInfo((prev) => ({
+                    ...prev,
+                    education: [
+                      ...prev.education,
+                      {
+                        school: "",
+                        major: "",
+                        period: "",
+                        location: "",
+                        description: "",
+                      },
+                    ],
+                  }))
+                }
+              >
+                <Plus className="w-4 h-4" />
+                Add education
+              </Button>
+            </div>
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              {aboutInfo.education.map((item, index) => (
+                <div
+                  key={`${item.school}-${item.period}-${index}`}
+                  className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-500">
+                      #{index + 1} Education
+                    </p>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.filter(
+                            (_, i) => i !== index,
+                          ),
+                        }))
+                      }
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="School"
+                      value={item.school}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.map((edu, i) =>
+                            i === index
+                              ? { ...edu, school: e.target.value }
+                              : edu,
+                          ),
+                        }))
+                      }
+                    />
+                    <Input
+                      placeholder="Major"
+                      value={item.major}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.map((edu, i) =>
+                            i === index
+                              ? { ...edu, major: e.target.value }
+                              : edu,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                  <Input
+                    placeholder="Period"
+                    value={item.period}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, period: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                  <Input
+                    placeholder="Location"
+                    value={item.location}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, location: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                  <Textarea
+                    rows={3}
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, description: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+              {aboutInfo.education.length === 0 && (
+                <p className="text-xs text-gray-500">
+                  No education items yet. Add your degrees and programs here.
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Experience */}
           <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
             <div className="flex items-center justify-between">
@@ -2828,142 +2985,6 @@ export function Admin() {
             </div>
           </div>
 
-          {/* Education */}
-          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">Education</h2>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  setAboutInfo((prev) => ({
-                    ...prev,
-                    education: [
-                      ...prev.education,
-                      {
-                        school: "",
-                        major: "",
-                        period: "",
-                        location: "",
-                        description: "",
-                      },
-                    ],
-                  }))
-                }
-              >
-                <Plus className="w-4 h-4" />
-                Add education
-              </Button>
-            </div>
-            <div className="space-y-3 pt-4 border-t border-gray-200">
-              {aboutInfo.education.map((item, index) => (
-                <div
-                  key={`${item.school}-${item.period}-${index}`}
-                  className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs text-gray-500">
-                      #{index + 1} Education
-                    </p>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      onClick={() =>
-                        setAboutInfo((prev) => ({
-                          ...prev,
-                          education: prev.education.filter(
-                            (_, i) => i !== index,
-                          ),
-                        }))
-                      }
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <Input
-                      placeholder="School"
-                      value={item.school}
-                      onChange={(e) =>
-                        setAboutInfo((prev) => ({
-                          ...prev,
-                          education: prev.education.map((edu, i) =>
-                            i === index
-                              ? { ...edu, school: e.target.value }
-                              : edu,
-                          ),
-                        }))
-                      }
-                    />
-                    <Input
-                      placeholder="Major"
-                      value={item.major}
-                      onChange={(e) =>
-                        setAboutInfo((prev) => ({
-                          ...prev,
-                          education: prev.education.map((edu, i) =>
-                            i === index
-                              ? { ...edu, major: e.target.value }
-                              : edu,
-                          ),
-                        }))
-                      }
-                    />
-                  </div>
-                  <Input
-                    placeholder="Period"
-                    value={item.period}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        education: prev.education.map((edu, i) =>
-                          i === index
-                            ? { ...edu, period: e.target.value }
-                            : edu,
-                        ),
-                      }))
-                    }
-                  />
-                  <Input
-                    placeholder="Location"
-                    value={item.location}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        education: prev.education.map((edu, i) =>
-                          i === index
-                            ? { ...edu, location: e.target.value }
-                            : edu,
-                        ),
-                      }))
-                    }
-                  />
-                  <Textarea
-                    rows={3}
-                    placeholder="Description"
-                    value={item.description}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        education: prev.education.map((edu, i) =>
-                          i === index
-                            ? { ...edu, description: e.target.value }
-                            : edu,
-                        ),
-                      }))
-                    }
-                  />
-                </div>
-              ))}
-              {aboutInfo.education.length === 0 && (
-                <p className="text-xs text-gray-500">
-                  No education items yet. Add your degrees and programs here.
-                </p>
-              )}
-            </div>
-          </div>
 
           {/* Availability */}
           <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">

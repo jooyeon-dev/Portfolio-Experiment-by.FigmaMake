@@ -43,6 +43,25 @@ export type SiteInfoForAbout = {
   role: string | null;
 };
 
+const FALLBACK_EDUCATION: AboutEducationItem[] = [
+  {
+    school: "Seoul National University",
+    major: "Visual Communication Design",
+    period: "2018 – 2022",
+    location: "Seoul, South Korea",
+    description:
+      "Focused on interaction design, typography, and user-centered design methodology while collaborating on cross-disciplinary projects.",
+  },
+  {
+    school: "Interaction Design Foundation",
+    major: "Human-Computer Interaction (Online Courses)",
+    period: "2022 – Present",
+    location: "Remote",
+    description:
+      "Continuous learning in UX research, information architecture, and service design to deepen product thinking.",
+  },
+];
+
 type UseAboutPageContentResult = {
   about: AboutData | null;
   siteInfo: SiteInfoForAbout | null;
@@ -97,15 +116,19 @@ export function useAboutPageContent(): UseAboutPageContentResult {
               description: String(item.description ?? ""),
             }))
           : [];
-        const educationArray: AboutEducationItem[] = Array.isArray(row.education)
-          ? row.education.map((item: any) => ({
-              school: String(item.school ?? ""),
-              major: String(item.major ?? ""),
-              period: String(item.period ?? ""),
-              location: String(item.location ?? ""),
-              description: String(item.description ?? ""),
-            }))
-          : [];
+        const educationArraySrc: any[] | null = Array.isArray(row.education)
+          ? row.education
+          : null;
+        const educationArray: AboutEducationItem[] =
+          educationArraySrc && educationArraySrc.length > 0
+            ? educationArraySrc.map((item: any) => ({
+                school: String(item.school ?? ""),
+                major: String(item.major ?? ""),
+                period: String(item.period ?? ""),
+                location: String(item.location ?? ""),
+                description: String(item.description ?? ""),
+              }))
+            : FALLBACK_EDUCATION;
         const skillsArray: string[] = Array.isArray(row.skills)
           ? row.skills.map((s: any) => String(s))
           : [];
