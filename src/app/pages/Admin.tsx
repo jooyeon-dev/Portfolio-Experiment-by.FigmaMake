@@ -129,6 +129,14 @@ type CurrentlyItem = {
   order_index: number;
 };
 
+type AboutEducationItem = {
+  school: string;
+  major: string;
+  period: string;
+  location: string;
+  description: string;
+};
+
 type AboutInfo = {
   id: string | null;
   photo_url: string;
@@ -148,6 +156,7 @@ type AboutInfo = {
     period: string;
     description: string;
   }[];
+  education: AboutEducationItem[];
   skills: string[];
   tools: string[];
 };
@@ -231,6 +240,7 @@ const DEFAULT_ABOUT: AboutInfo = {
   current_obsession: "",
   colleague_tags: [],
   experience: [],
+  education: [],
   skills: [],
   tools: [],
 };
@@ -418,6 +428,14 @@ export function Admin() {
           current_obsession: row.current_obsession ?? "",
           colleague_tags: row.colleague_tags ?? [],
           experience: (row.experience as any[] | null) ?? [],
+          education:
+            (row.education as AboutEducationItem[] | null)?.map((item) => ({
+              school: item.school ?? "",
+              major: item.major ?? "",
+              period: item.period ?? "",
+              location: item.location ?? "",
+              description: item.description ?? "",
+            })) ?? [],
           skills: row.skills ?? [],
           tools: row.tools ?? [],
         });
@@ -2807,6 +2825,143 @@ export function Admin() {
                   }
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Education */}
+          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">Education</h2>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setAboutInfo((prev) => ({
+                    ...prev,
+                    education: [
+                      ...prev.education,
+                      {
+                        school: "",
+                        major: "",
+                        period: "",
+                        location: "",
+                        description: "",
+                      },
+                    ],
+                  }))
+                }
+              >
+                <Plus className="w-4 h-4" />
+                Add education
+              </Button>
+            </div>
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              {aboutInfo.education.map((item, index) => (
+                <div
+                  key={`${item.school}-${item.period}-${index}`}
+                  className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-500">
+                      #{index + 1} Education
+                    </p>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.filter(
+                            (_, i) => i !== index,
+                          ),
+                        }))
+                      }
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="School"
+                      value={item.school}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.map((edu, i) =>
+                            i === index
+                              ? { ...edu, school: e.target.value }
+                              : edu,
+                          ),
+                        }))
+                      }
+                    />
+                    <Input
+                      placeholder="Major"
+                      value={item.major}
+                      onChange={(e) =>
+                        setAboutInfo((prev) => ({
+                          ...prev,
+                          education: prev.education.map((edu, i) =>
+                            i === index
+                              ? { ...edu, major: e.target.value }
+                              : edu,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                  <Input
+                    placeholder="Period"
+                    value={item.period}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, period: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                  <Input
+                    placeholder="Location"
+                    value={item.location}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, location: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                  <Textarea
+                    rows={3}
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        education: prev.education.map((edu, i) =>
+                          i === index
+                            ? { ...edu, description: e.target.value }
+                            : edu,
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+              {aboutInfo.education.length === 0 && (
+                <p className="text-xs text-gray-500">
+                  No education items yet. Add your degrees and programs here.
+                </p>
+              )}
             </div>
           </div>
 

@@ -8,6 +8,14 @@ export type AboutExperienceItem = {
   description: string;
 };
 
+export type AboutEducationItem = {
+  school: string;
+  major: string;
+  period: string;
+  location: string;
+  description: string;
+};
+
 export type AboutData = {
   photo_url: string | null;
   intro_text: string | null;
@@ -20,6 +28,7 @@ export type AboutData = {
   also_me: string | null;
   current_obsession: string | null;
   experience: AboutExperienceItem[];
+  education: AboutEducationItem[];
   skills: string[];
   tools: string[];
 };
@@ -88,6 +97,15 @@ export function useAboutPageContent(): UseAboutPageContentResult {
               description: String(item.description ?? ""),
             }))
           : [];
+        const educationArray: AboutEducationItem[] = Array.isArray(row.education)
+          ? row.education.map((item: any) => ({
+              school: String(item.school ?? ""),
+              major: String(item.major ?? ""),
+              period: String(item.period ?? ""),
+              location: String(item.location ?? ""),
+              description: String(item.description ?? ""),
+            }))
+          : [];
         const skillsArray: string[] = Array.isArray(row.skills)
           ? row.skills.map((s: any) => String(s))
           : [];
@@ -107,6 +125,7 @@ export function useAboutPageContent(): UseAboutPageContentResult {
           also_me: row.also_me ?? null,
           current_obsession: row.current_obsession ?? null,
           experience: experienceArray,
+          education: educationArray,
           skills: skillsArray,
           tools: toolsArray,
         });

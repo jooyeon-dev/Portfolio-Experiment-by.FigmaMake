@@ -123,26 +123,14 @@ export function About() {
       ? about.resume_url.trim()
       : "";
 
+  const education = Array.isArray(about?.education) ? about.education : [];
+  const hasEducation = education.length > 0;
+
   const headerSubtitle =
     (about?.intro_subtitle && about.intro_subtitle.trim().length > 0
       ? about.intro_subtitle.trim()
       : "") ||
     "Passionate about creating intuitive and delightful user experiences";
-
-  const studies =
-    about?.studies && about.studies.trim().length > 0
-      ? about.studies.trim()
-      : "";
-  const basedIn =
-    about?.based_in && about.based_in.trim().length > 0
-      ? about.based_in.trim()
-      : "";
-  const languages =
-    about?.languages && about.languages.trim().length > 0
-      ? about.languages.trim()
-      : "";
-
-  const hasStudies = studies.length > 0;
 
   const offTheClock =
     about?.off_the_clock && about.off_the_clock.trim().length > 0
@@ -211,26 +199,39 @@ export function About() {
       </div>
 
       {/* 3. Education */}
-      {hasStudies && (
+      {hasEducation && (
         <section className="mb-20">
           <h2 className="text-3xl mb-8">Education</h2>
-          <div className="space-y-3 text-gray-700">
-            <p>{studies}</p>
-            {(basedIn || languages) && (
-              <div className="text-sm text-gray-500 space-y-1">
-                {basedIn && (
-                  <p>
-                    <span className="font-medium">Based in:</span> {basedIn}
+          <div className="space-y-8">
+            {education.map((item, index) => (
+              <div
+                key={`${item.school}-${item.period}-${index}`}
+                className="border-l-2 border-gray-200 pl-6"
+              >
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-1">
+                  <h3 className="text-xl">
+                    {item.school || "Untitled education"}
+                  </h3>
+                  {item.period && (
+                    <span className="text-gray-500">{item.period}</span>
+                  )}
+                </div>
+                {item.major && (
+                  <p className="text-gray-600">
+                    <span className="font-medium">Major:</span> {item.major}
                   </p>
                 )}
-                {languages && (
-                  <p>
-                    <span className="font-medium">Languages:</span>{" "}
-                    {languages}
+                {item.location && (
+                  <p className="text-gray-600">
+                    <span className="font-medium">Location:</span>{" "}
+                    {item.location}
                   </p>
+                )}
+                {item.description && (
+                  <p className="text-gray-600 mt-2">{item.description}</p>
                 )}
               </div>
-            )}
+            ))}
           </div>
         </section>
       )}
