@@ -28,11 +28,19 @@ export type AboutSummary = {
   current_obsession: string;
 };
 
+export type HeroSummary = {
+  headline: string;
+  description: string;
+  ctaPrimary: string;
+  ctaSecondary: string;
+};
+
 type UseHomeContentResult = {
   how: HowItem[];
   currently: CurrentlyItem[];
   values: ValueItem[];
   about: AboutSummary | null;
+  hero: HeroSummary | null;
   loading: boolean;
 };
 
@@ -41,6 +49,7 @@ export function useHomeContent(): UseHomeContentResult {
   const [currently, setCurrently] = useState<CurrentlyItem[]>([]);
   const [values, setValues] = useState<ValueItem[]>([]);
   const [about, setAbout] = useState<AboutSummary | null>(null);
+  const [hero, setHero] = useState<HeroSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -54,7 +63,7 @@ export function useHomeContent(): UseHomeContentResult {
 
       setLoading(true);
 
-      const [howRes, curRes, valuesRes, aboutRes] = await Promise.all([
+      const [howRes, curRes, valuesRes, aboutRes, siteRes] = await Promise.all([
         supabase
           .from("how_i_work")
           .select("*")
@@ -68,6 +77,7 @@ export function useHomeContent(): UseHomeContentResult {
           .select("*")
           .order("order_index", { ascending: true }),
         supabase.from("about").select("*").limit(1).maybeSingle(),
+        supabase.from("site_info").select("*").limit(1).maybeSingle(),
       ]);
 
       if (cancelled) return;
@@ -114,6 +124,24 @@ export function useHomeContent(): UseHomeContentResult {
         });
       }
 
+      if (!siteRes.error && siteRes.data) {
+        const row = siteRes.data as any;
+        setHero({
+          headline:
+            String(row.hero_headline ?? "").trim() ||
+            "Product Designer crafting meaningful digital experiences",
+          description:
+            String(row.hero_description ?? "").trim() ||
+            "I design user-centered products that solve real problems and delight users.",
+          ctaPrimary:
+            String(row.hero_cta_primary ?? "").trim() || "View my work",
+          ctaSecondary:
+            String(row.hero_cta_secondary ?? "").trim() || "Get in touch",
+        });
+      } else {
+        setHero(null);
+      }
+
       setLoading(false);
     }
 
@@ -124,6 +152,6 @@ export function useHomeContent(): UseHomeContentResult {
     };
   }, []);
 
-  return { how, currently, values, about, loading };
+  return { how, currently, values, about, hero, loading };
 }
 

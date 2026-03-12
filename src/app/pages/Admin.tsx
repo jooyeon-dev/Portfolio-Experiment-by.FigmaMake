@@ -109,6 +109,8 @@ type SiteInfo = {
   location: string;
   hero_headline: string;
   hero_description: string;
+  hero_cta_primary: string;
+  hero_cta_secondary: string;
   contact_email: string;
   linkedin_url: string;
   github_url: string;
@@ -202,6 +204,8 @@ const DEFAULT_SITE_INFO: SiteInfo = {
   location: "",
   hero_headline: "",
   hero_description: "",
+  hero_cta_primary: "",
+  hero_cta_secondary: "",
   contact_email: "",
   linkedin_url: "",
   github_url: "",
@@ -329,6 +333,8 @@ export function Admin() {
           location: row.location ?? "",
           hero_headline: row.hero_headline ?? "",
           hero_description: row.hero_description ?? "",
+          hero_cta_primary: row.hero_cta_primary ?? "",
+          hero_cta_secondary: row.hero_cta_secondary ?? "",
           contact_email: row.contact_email ?? "",
           linkedin_url: row.linkedin_url ?? "",
           github_url: row.github_url ?? "",
@@ -1111,6 +1117,39 @@ export function Admin() {
                 }))
               }
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Primary CTA label
+              </label>
+              <Input
+                value={siteInfo.hero_cta_primary}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    hero_cta_primary: e.target.value,
+                  }))
+                }
+                placeholder="View my work"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Secondary CTA label
+              </label>
+              <Input
+                value={siteInfo.hero_cta_secondary}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    hero_cta_secondary: e.target.value,
+                  }))
+                }
+                placeholder="Get in touch"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

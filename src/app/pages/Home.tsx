@@ -6,7 +6,7 @@ import { useHomeContent } from "../hooks/useHomeContent";
 
 export function Home() {
   const { projects: featuredProjects, loading, error } = useFeaturedProjects(3);
-  const { how, currently, values, about } = useHomeContent();
+  const { how, currently, values, about, hero } = useHomeContent();
 
   return (
     <div>
@@ -14,25 +14,26 @@ export function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <div className="max-w-4xl">
           <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6">
-            Product Designer crafting meaningful digital experiences
+            {hero?.headline ??
+              "Product Designer crafting meaningful digital experiences"}
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8">
-            I design user-centered products that solve real problems and delight users.
-            Currently working at a leading tech company in San Francisco.
+            {hero?.description ??
+              "I design user-centered products that solve real problems and delight users."}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
               to="/projects"
               className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
             >
-              View My Work
+              {hero?.ctaPrimary ?? "View my work"}
               <ArrowRight size={20} />
             </Link>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full border border-gray-300 hover:border-gray-900 transition-colors"
             >
-              Get In Touch
+              {hero?.ctaSecondary ?? "Get in touch"}
             </Link>
           </div>
         </div>
