@@ -301,6 +301,21 @@ export function Admin() {
   const [aboutSaveStatus, setAboutSaveStatus] = useState<
     "idle" | "saved" | "error"
   >("idle");
+  const [howSaveStatus, setHowSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
+  const [currentSaveStatus, setCurrentSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
+  const [siteInfoSaveStatus, setSiteInfoSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
+  const [valuesSaveStatus, setValuesSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
+  const [projectSaveStatus, setProjectSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
   const [aboutPhotoFiles, setAboutPhotoFiles] = useState<string[]>([]);
   const [resumeFiles, setResumeFiles] = useState<string[]>([]);
 
@@ -570,9 +585,13 @@ export function Admin() {
     if (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+      setSiteInfoSaveStatus("error");
+      setTimeout(() => setSiteInfoSaveStatus("idle"), 2000);
       return;
     }
     setSiteInfo((prev) => ({ ...prev, id }));
+    setSiteInfoSaveStatus("saved");
+    setTimeout(() => setSiteInfoSaveStatus("idle"), 2000);
   }
 
   // ------- how_i_work -------
@@ -611,9 +630,18 @@ export function Admin() {
 
     const idsNow = howItems.map((i) => i.id);
     const idsToDelete = howInitialIds.filter((id) => !idsNow.includes(id));
+    let hadError = false;
 
     if (idsToDelete.length > 0) {
-      await supabase.from("how_i_work").delete().in("id", idsToDelete);
+      const { error: delErr } = await supabase
+        .from("how_i_work")
+        .delete()
+        .in("id", idsToDelete);
+      if (delErr) {
+        // eslint-disable-next-line no-console
+        console.error(delErr);
+        hadError = true;
+      }
     }
 
     if (howItems.length > 0) {
@@ -629,11 +657,19 @@ export function Admin() {
       if (error) {
         // eslint-disable-next-line no-console
         console.error(error);
+        hadError = true;
       }
     }
 
     setHowInitialIds(idsNow);
     setHowSaving(false);
+    if (hadError) {
+      setHowSaveStatus("error");
+      setTimeout(() => setHowSaveStatus("idle"), 2000);
+    } else {
+      setHowSaveStatus("saved");
+      setTimeout(() => setHowSaveStatus("idle"), 2000);
+    }
   }
 
   // ------- currently -------
@@ -673,9 +709,18 @@ export function Admin() {
     const idsToDelete = currentInitialIds.filter(
       (id) => !idsNow.includes(id),
     );
+    let hadError = false;
 
     if (idsToDelete.length > 0) {
-      await supabase.from("currently").delete().in("id", idsToDelete);
+      const { error: delErr } = await supabase
+        .from("currently")
+        .delete()
+        .in("id", idsToDelete);
+      if (delErr) {
+        // eslint-disable-next-line no-console
+        console.error(delErr);
+        hadError = true;
+      }
     }
 
     if (currentItems.length > 0) {
@@ -690,11 +735,19 @@ export function Admin() {
       if (error) {
         // eslint-disable-next-line no-console
         console.error(error);
+        hadError = true;
       }
     }
 
     setCurrentInitialIds(idsNow);
     setCurrentSaving(false);
+    if (hadError) {
+      setCurrentSaveStatus("error");
+      setTimeout(() => setCurrentSaveStatus("idle"), 2000);
+    } else {
+      setCurrentSaveStatus("saved");
+      setTimeout(() => setCurrentSaveStatus("idle"), 2000);
+    }
   }
 
   // ------- projects (case study) -------
@@ -789,9 +842,13 @@ export function Admin() {
     if (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+      setProjectSaveStatus("error");
+      setTimeout(() => setProjectSaveStatus("idle"), 2000);
       return;
     }
 
+    setProjectSaveStatus("saved");
+    setTimeout(() => setProjectSaveStatus("idle"), 2000);
     setSelectedProjectId(id);
     reset({ ...values, id });
 
@@ -1019,9 +1076,18 @@ export function Admin() {
     const idsToDelete = valuesInitialIds.filter(
       (id) => !idsNow.includes(id),
     );
+    let hadError = false;
 
     if (idsToDelete.length > 0) {
-      await supabase.from("values").delete().in("id", idsToDelete);
+      const { error: delErr } = await supabase
+        .from("values")
+        .delete()
+        .in("id", idsToDelete);
+      if (delErr) {
+        // eslint-disable-next-line no-console
+        console.error(delErr);
+        hadError = true;
+      }
     }
 
     if (valuesItems.length > 0) {
@@ -1038,11 +1104,19 @@ export function Admin() {
       if (error) {
         // eslint-disable-next-line no-console
         console.error(error);
+        hadError = true;
       }
     }
 
     setValuesInitialIds(idsNow);
     setValuesSaving(false);
+    if (hadError) {
+      setValuesSaveStatus("error");
+      setTimeout(() => setValuesSaveStatus("idle"), 2000);
+    } else {
+      setValuesSaveStatus("saved");
+      setTimeout(() => setValuesSaveStatus("idle"), 2000);
+    }
   }
 
   if (!authorized) {
@@ -1144,7 +1218,11 @@ export function Admin() {
                 size="sm"
                 disabled={siteSaving || disabledBecauseNoSupabase}
               >
-                Save hero
+                {siteInfoSaveStatus === "saved"
+                  ? "✓ Saved!"
+                  : siteInfoSaveStatus === "error"
+                    ? "✗ Failed"
+                    : "Save hero"}
               </Button>
             </div>
 
@@ -1316,7 +1394,11 @@ export function Admin() {
                 onClick={handleSaveHow}
                 disabled={howSaving || disabledBecauseNoSupabase}
               >
-                Save How I Work
+                {howSaveStatus === "saved"
+                  ? "✓ Saved!"
+                  : howSaveStatus === "error"
+                    ? "✗ Failed"
+                    : "Save How I Work"}
               </Button>
             </div>
           </div>
@@ -1401,7 +1483,11 @@ export function Admin() {
                 onClick={handleSaveCurrent}
                 disabled={currentSaving || disabledBecauseNoSupabase}
               >
-                Save Currently
+                {currentSaveStatus === "saved"
+                  ? "✓ Saved!"
+                  : currentSaveStatus === "error"
+                    ? "✗ Failed"
+                    : "Save Currently"}
               </Button>
             </div>
           </div>
@@ -1519,7 +1605,11 @@ export function Admin() {
                 onClick={handleSaveValues}
                 disabled={valuesSaving || disabledBecauseNoSupabase}
               >
-                Save values
+                {valuesSaveStatus === "saved"
+                  ? "✓ Saved!"
+                  : valuesSaveStatus === "error"
+                    ? "✗ Failed"
+                    : "Save values"}
               </Button>
             </div>
           </div>
@@ -2406,7 +2496,11 @@ export function Admin() {
                         savingProject || disabledBecauseNoSupabase || !projectDirty
                       }
                     >
-                      Save project
+                      {projectSaveStatus === "saved"
+                        ? "✓ Saved!"
+                        : projectSaveStatus === "error"
+                          ? "✗ Failed"
+                          : "Save project"}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -3272,7 +3366,11 @@ export function Admin() {
               size="sm"
               disabled={siteSaving || disabledBecauseNoSupabase}
             >
-              Save settings
+              {siteInfoSaveStatus === "saved"
+                ? "✓ Saved!"
+                : siteInfoSaveStatus === "error"
+                  ? "✗ Failed"
+                  : "Save settings"}
             </Button>
           </div>
         </form>
