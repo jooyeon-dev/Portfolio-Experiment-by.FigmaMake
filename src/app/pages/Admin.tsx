@@ -298,6 +298,11 @@ export function Admin() {
 
   const [aboutInfo, setAboutInfo] = useState<AboutInfo>(DEFAULT_ABOUT);
   const [aboutSaving, setAboutSaving] = useState(false);
+  const [aboutSaveStatus, setAboutSaveStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
+  const [aboutPhotoFiles, setAboutPhotoFiles] = useState<string[]>([]);
+  const [resumeFiles, setResumeFiles] = useState<string[]>([]);
 
   const [valuesItems, setValuesItems] = useState<ValueItem[]>([]);
   const [valuesInitialIds, setValuesInitialIds] = useState<string[]>([]);
@@ -473,6 +478,33 @@ export function Admin() {
         }));
         setValuesItems(items);
         setValuesInitialIds(items.map((i) => i.id));
+      }
+
+      // Load existing storage files for About photos and resumes
+      const [photoList, resumeList] = await Promise.all([
+        supabase.storage.from(STORAGE_BUCKET).list("about-photo"),
+        supabase.storage.from(STORAGE_BUCKET).list("resume"),
+      ]);
+
+      if (!cancelled) {
+        if (photoList.data) {
+          setAboutPhotoFiles(
+            photoList.data.map((f) =>
+              supabase.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(`about-photo/${f.name}`).data.publicUrl,
+            ),
+          );
+        }
+        if (resumeList.data) {
+          setResumeFiles(
+            resumeList.data.map((f) =>
+              supabase.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(`resume/${f.name}`).data.publicUrl,
+            ),
+          );
+        }
       }
     }
 
@@ -902,6 +934,7 @@ export function Admin() {
     e.preventDefault();
     if (!supabase) return;
     setAboutSaving(true);
+    setAboutSaveStatus("idle");
     const id = aboutInfo.id ?? crypto.randomUUID();
     const payload = {
       id,
@@ -914,9 +947,13 @@ export function Admin() {
     if (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+      setAboutSaveStatus("error");
+      setTimeout(() => setAboutSaveStatus("idle"), 2000);
       return;
     }
     setAboutInfo((prev) => ({ ...prev, id }));
+    setAboutSaveStatus("saved");
+    setTimeout(() => setAboutSaveStatus("idle"), 2000);
   }
 
   async function handleUploadAboutPhoto(
@@ -928,6 +965,7 @@ export function Admin() {
     const url = await uploadToStorage("about-photo", file);
     if (!url) return;
     setAboutInfo((prev) => ({ ...prev, photo_url: url }));
+    setAboutPhotoFiles((prev) => [...prev, url]);
   }
 
   async function handleUploadResume(
@@ -939,6 +977,7 @@ export function Admin() {
     const url = await uploadToStorage("resume", file);
     if (!url) return;
     setAboutInfo((prev) => ({ ...prev, resume_url: url }));
+    setResumeFiles((prev) => [...prev, url]);
   }
 
   // ------- values -------
@@ -2476,6 +2515,45 @@ export function Admin() {
                   <label className="text-sm font-medium mb-1 block">
                     Photo
                   </label>
+
+                  {/* Existing files */}
+                  {aboutPhotoFiles.length > 0 && (
+                    <div className="mb-2">
+                      <p className="text-xs text-gray-500 mb-1">
+                        또는 기존 파일에서 선택
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {aboutPhotoFiles.map((url) => {
+                          const isSelected = aboutInfo.photo_url === url;
+                          return (
+                            <button
+                              key={url}
+                              type="button"
+                              onClick={() =>
+                                setAboutInfo((prev) => ({
+                                  ...prev,
+                                  photo_url: url,
+                                }))
+                              }
+                              className={`relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 border ${
+                                isSelected
+                                  ? "border-2 border-gray-900"
+                                  : "border-transparent"
+                              }`}
+                            >
+                              <ImageWithFallback
+                                src={url}
+                                alt="About photo option"
+                                className="w-full h-full object-cover"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upload new */}
                   <input
                     type="file"
                     accept="image/*"
@@ -2483,7 +2561,7 @@ export function Admin() {
                     disabled={disabledBecauseNoSupabase}
                   />
                   {aboutInfo.photo_url && (
-                    <div className="mt-3 w-full max-w-xs">
+                    <div className="mt-3 w-full max-w-xs space-y-2">
                       <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100">
                         <ImageWithFallback
                           src={aboutInfo.photo_url}
@@ -2491,22 +2569,91 @@ export function Admin() {
                           className="w-full h-full object-cover"
                         />
                       </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setAboutInfo((prev) => ({
+                            ...prev,
+                            photo_url: "",
+                          }))
+                        }
+                      >
+                        Remove photo
+                      </Button>
                     </div>
                   )}
                 </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium mb-1 block">
                     Resume file
                   </label>
+
+                  {/* Existing resume files */}
+                  {resumeFiles.length > 0 && (
+                    <div className="mb-2 space-y-1">
+                      <p className="text-xs text-gray-500">
+                        또는 기존 파일에서 선택
+                      </p>
+                      <ul className="space-y-1 text-xs">
+                        {resumeFiles.map((url) => {
+                          const fileName =
+                            url.split("/").pop()?.split("-").slice(3).join("-") ??
+                            url;
+                          const isSelected = aboutInfo.resume_url === url;
+                          return (
+                            <li key={url}>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setAboutInfo((prev) => ({
+                                    ...prev,
+                                    resume_url: url,
+                                  }))
+                                }
+                                className={`text-left hover:text-gray-900 ${
+                                  isSelected
+                                    ? "font-medium text-gray-900"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                {fileName}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Upload new */}
                   <input
                     type="file"
                     onChange={handleUploadResume}
                     disabled={disabledBecauseNoSupabase}
                   />
                   {aboutInfo.resume_url && (
-                    <p className="text-xs text-gray-600 mt-1 break-all">
-                      {aboutInfo.resume_url}
-                    </p>
+                    <div className="mt-1 flex items-center gap-2 text-xs">
+                      <span className="text-emerald-600 font-medium">
+                        ✓ Resume uploaded
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        className="h-6 px-2 text-gray-500 hover:text-gray-900"
+                        onClick={() =>
+                          setAboutInfo((prev) => ({
+                            ...prev,
+                            resume_url: "",
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -2899,7 +3046,11 @@ export function Admin() {
               size="sm"
               disabled={aboutSaving || disabledBecauseNoSupabase}
             >
-              Save About
+              {aboutSaveStatus === "saved"
+                ? "✓ Saved!"
+                : aboutSaveStatus === "error"
+                  ? "✗ Failed"
+                  : "Save About"}
             </Button>
           </div>
         </form>
