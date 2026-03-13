@@ -162,7 +162,8 @@ export function About() {
   const hasSkillsOrTools = hasSkills || hasTools;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-0">
       {/* Header */}
       <div className="mb-16">
         <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6">About Me</h1>
@@ -335,55 +336,58 @@ export function About() {
           </div>
         </section>
       )}
+      </div>
 
-      {/* 7. Contact & Availability */}
-      <section className="mb-20 border-t border-gray-200 pt-10">
-        <h2 className="text-3xl mb-8">Let&apos;s connect</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex items-start gap-3">
-            <Mail className="mt-1 text-gray-500" size={20} />
-            <div>
-              <p className="text-sm text-gray-500">Email</p>
-              <a
-                href={`mailto:${email}`}
-                className="text-gray-900 hover:underline break-all"
-              >
-                {email}
-              </a>
+      {/* 7. Contact & Availability (full-width) */}
+      <section className="w-screen relative left-1/2 -translate-x-1/2 bg-gray-900 px-8 py-20 -mb-24">
+        <div className="max-w-4xl mx-auto mb-0 pb-0">
+          <h2 className="text-3xl mb-8 text-white">Let&apos;s connect</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex items-start gap-3">
+              <Mail className="mt-1 text-gray-400" size={20} />
+              <div>
+                <p className="text-sm text-gray-400">Email</p>
+                <a
+                  href={`mailto:${email}`}
+                  className="text-white hover:underline break-all"
+                >
+                  {email}
+                </a>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <MapPin className="mt-1 text-gray-400" size={20} />
+              <div>
+                <p className="text-sm text-gray-400">Location</p>
+                <p className="text-white">{location}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <LinkedinIcon className="mt-1 text-gray-400" size={20} />
+              <div>
+                <p className="text-sm text-gray-400">LinkedIn</p>
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-white hover:underline"
+                >
+                  View profile
+                </a>
+              </div>
             </div>
           </div>
-          <div className="flex items-start gap-3">
-            <MapPin className="mt-1 text-gray-500" size={20} />
-            <div>
-              <p className="text-sm text-gray-500">Location</p>
-              <p className="text-gray-900">{location}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <LinkedinIcon className="mt-1 text-gray-500" size={20} />
-            <div>
-              <p className="text-sm text-gray-500">LinkedIn</p>
-              <a
-                href={linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-gray-900 hover:underline"
-              >
-                View profile
-              </a>
-            </div>
-          </div>
-        </div>
 
-        <div className="mt-8 flex items-center gap-3">
-          <span
-            className={`inline-block w-2.5 h-2.5 rounded-full ${
-              isAvailable ? "bg-emerald-500" : "bg-gray-400"
-            }`}
-          />
-          <p className="text-gray-700">{availabilityText}</p>
+          <div className="mt-8 flex items-center gap-3">
+            <span
+              className={`inline-block w-2.5 h-2.5 rounded-full ${
+                isAvailable ? "bg-emerald-500" : "bg-gray-400"
+              }`}
+            />
+            <p className="text-gray-300">{availabilityText}</p>
+          </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }
