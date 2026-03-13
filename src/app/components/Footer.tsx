@@ -14,7 +14,7 @@ export function Footer() {
 
   return (
     <footer className="bg-gray-50 border-t border-gray-200 mt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="mb-4">{name}</h3>
@@ -72,7 +72,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center text-gray-600">
+        <div className="mt-14 pt-10 border-t border-gray-200 text-center text-gray-600">
           <p>© 2026 Jooyeon Choi. All rights reserved.</p>
         </div>
       </div>
