@@ -570,6 +570,15 @@ export function Admin() {
     return data.publicUrl;
   }
 
+  async function deleteFromStorage(publicUrl: string) {
+    if (!supabase) return;
+    const prefix = `/object/public/${STORAGE_BUCKET}/`;
+    const i = publicUrl.indexOf(prefix);
+    if (i === -1) return;
+    const path = publicUrl.slice(i + prefix.length);
+    await supabase.storage.from(STORAGE_BUCKET).remove([path]);
+  }
+
   // ------- site_info -------
 
   async function handleSaveSiteInfo(e: React.FormEvent) {
@@ -2640,6 +2649,26 @@ export function Admin() {
                                 alt="About photo option"
                                 className="w-full h-full object-cover"
                               />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteFromStorage(url);
+                                  setAboutPhotoFiles((prev) =>
+                                    prev.filter((f) => f !== url)
+                                  );
+                                  if (aboutInfo.photo_url === url) {
+                                    setAboutInfo((prev) => ({
+                                      ...prev,
+                                      photo_url: "",
+                                    }));
+                                  }
+                                }}
+                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
+                                aria-label="Delete photo"
+                              >
+                                ×
+                              </button>
                             </button>
                           );
                         })}

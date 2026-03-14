@@ -7,8 +7,6 @@ const FALLBACK_LOCATION = "Seoul, South Korea";
 const FALLBACK_EMAIL = "alex@example.com";
 const FALLBACK_LINKEDIN = "https://linkedin.com";
 const FALLBACK_AVAILABILITY_TEXT = "Currently open to new opportunities.";
-const FALLBACK_PHOTO_URL =
-  "https://images.unsplash.com/photo-1767439567636-792a76f6e4b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMHdvbWFuJTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MXx8fHwxNzcyODUwMjEzfDA&ixlib=rb-4.1.0&q=80&w=1080";
 const FALLBACK_INTRO_PARAGRAPHS = [
   "I'm a product designer with over 6 years of experience creating digital products that people love to use. My approach combines user research, strategic thinking, and visual design to solve complex problems.",
   "I believe great design is invisible—it just works. I'm passionate about accessibility, design systems, and mentoring junior designers. When I'm not designing, you can find me hiking, photography, or exploring new coffee shops.",
@@ -91,7 +89,7 @@ export function About() {
       siteInfo.availability_text.trim()) ||
     FALLBACK_AVAILABILITY_TEXT;
 
-  const photoUrl = about?.photo_url || FALLBACK_PHOTO_URL;
+  const photoUrl = about?.photo_url ?? "";
 
   const introText =
     about?.intro_text && about.intro_text.trim().length > 0
@@ -174,11 +172,17 @@ export function About() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
         <div>
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-            <ImageWithFallback
-              src={photoUrl}
-              alt={name}
-              className="w-full h-full object-cover"
-            />
+            {photoUrl ? (
+              <ImageWithFallback
+                src={photoUrl}
+                alt={name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-gray-200" />
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col justify-center">
