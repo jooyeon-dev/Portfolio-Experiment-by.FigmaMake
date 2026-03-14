@@ -70,7 +70,7 @@ function toSimpleIconSlug(name: string): string {
 }
 
 export function About() {
-  const { about, siteInfo } = useAboutPageContent();
+  const { about, siteInfo, loading } = useAboutPageContent();
 
   const name = siteInfo?.name?.trim() || FALLBACK_NAME;
   const location =
@@ -172,7 +172,9 @@ export function About() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
         <div>
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-            {photoUrl ? (
+            {loading ? (
+              <div className="w-full h-full bg-gray-100 animate-pulse" />
+            ) : photoUrl ? (
               <ImageWithFallback
                 src={photoUrl}
                 alt={name}
@@ -186,15 +188,25 @@ export function About() {
           </div>
         </div>
         <div className="flex flex-col justify-center">
-          <h2 className="text-3xl mb-6">Hello, I'm {name}</h2>
-          {introParagraphs.map((paragraph) => (
-            <p
-              key={paragraph}
-              className="text-lg text-gray-600 mb-6 leading-relaxed last:mb-8"
-            >
-              {paragraph}
-            </p>
-          ))}
+          {loading ? (
+            <div className="space-y-4 mb-6">
+              <div className="h-8 w-56 bg-gray-100 rounded animate-pulse" />
+              <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+              <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
+            </div>
+          ) : (
+            <>
+              <h2 className="text-3xl mb-6">Hello, I'm {name}</h2>
+              {introParagraphs.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className="text-lg text-gray-600 mb-6 leading-relaxed last:mb-8"
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </>
+          )}
           {resumeUrl && (
             <button
               type="button"
@@ -211,134 +223,202 @@ export function About() {
       </div>
 
       {/* 3. Education */}
-      {hasEducation && (
+      {loading ? (
         <section className="mb-20">
-          <h2 className="text-3xl mb-8">Education</h2>
-          <div className="space-y-8">
-            {education.map((item, index) => (
+          <div className="h-8 w-32 bg-gray-100 rounded mb-8 animate-pulse" />
+          <div className="space-y-6">
+            {[1, 2].map((i) => (
               <div
-                key={`${item.school}-${item.period}-${index}`}
-                className="border-l-2 border-gray-200 pl-6"
+                key={i}
+                className="border-l-2 border-gray-100 pl-6 space-y-2"
               >
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-1">
-                  <h3 className="text-xl">
-                    {item.school || "Untitled education"}
-                  </h3>
-                  {item.period && (
-                    <span className="text-gray-500">{item.period}</span>
+                <div className="h-5 w-48 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        hasEducation && (
+          <section className="mb-20">
+            <h2 className="text-3xl mb-8">Education</h2>
+            <div className="space-y-8">
+              {education.map((item, index) => (
+                <div
+                  key={`${item.school}-${item.period}-${index}`}
+                  className="border-l-2 border-gray-200 pl-6"
+                >
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-1">
+                    <h3 className="text-xl">
+                      {item.school || "Untitled education"}
+                    </h3>
+                    {item.period && (
+                      <span className="text-gray-500">{item.period}</span>
+                    )}
+                  </div>
+                  {item.major && (
+                    <p className="text-gray-600">
+                      <span className="font-medium">Major:</span> {item.major}
+                    </p>
+                  )}
+                  {item.location && (
+                    <p className="text-gray-600">
+                      <span className="font-medium">Location:</span>{" "}
+                      {item.location}
+                    </p>
+                  )}
+                  {item.description && (
+                    <p className="text-gray-600 mt-2">{item.description}</p>
                   )}
                 </div>
-                {item.major && (
-                  <p className="text-gray-600">
-                    <span className="font-medium">Major:</span> {item.major}
-                  </p>
-                )}
-                {item.location && (
-                  <p className="text-gray-600">
-                    <span className="font-medium">Location:</span>{" "}
-                    {item.location}
-                  </p>
-                )}
-                {item.description && (
-                  <p className="text-gray-600 mt-2">{item.description}</p>
-                )}
+              ))}
+            </div>
+          </section>
+        )
+      )}
+
+      {/* 4. Experience */}
+      {loading ? (
+        <section className="mb-20">
+          <div className="h-8 w-32 bg-gray-100 rounded mb-8 animate-pulse" />
+          <div className="space-y-6">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="border-l-2 border-gray-100 pl-6 space-y-2"
+              >
+                <div className="h-5 w-48 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="mb-20">
+          <h2 className="text-3xl mb-8">Experience</h2>
+          <div className="space-y-8">
+            {experience.map((job, index) => (
+              <div key={index} className="border-l-2 border-gray-200 pl-6">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
+                  <h3 className="text-xl">{job.title}</h3>
+                  <span className="text-gray-500">{job.period}</span>
+                </div>
+                <p className="text-gray-600 mb-2">{job.company}</p>
+                <p className="text-gray-600">{job.description}</p>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* 4. Experience */}
-      <section className="mb-20">
-        <h2 className="text-3xl mb-8">Experience</h2>
-        <div className="space-y-8">
-          {experience.map((job, index) => (
-            <div key={index} className="border-l-2 border-gray-200 pl-6">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                <h3 className="text-xl">{job.title}</h3>
-                <span className="text-gray-500">{job.period}</span>
-              </div>
-              <p className="text-gray-600 mb-2">{job.company}</p>
-              <p className="text-gray-600">{job.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* 5. Skills & Tools */}
-      {hasSkillsOrTools && (
+      {loading ? (
         <section className="mb-20">
-          <h2 className="text-3xl mb-8">Skills &amp; Tools</h2>
-          {hasSkills && (
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
-                Skills
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {skills.map((skill) => (
-                  <div
-                    key={skill}
-                    className="p-3 bg-gray-50 rounded-lg flex items-center gap-2"
-                  >
-                    <span className="text-sm text-gray-700">{skill}</span>
-                  </div>
-                ))}
+          <div className="h-8 w-32 bg-gray-100 rounded mb-8 animate-pulse" />
+          <div className="space-y-6">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="border-l-2 border-gray-100 pl-6 space-y-2"
+              >
+                <div className="h-5 w-48 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
               </div>
-            </div>
-          )}
-          {hasTools && (
-            <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
-                Tools
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {tools.map((tool) => (
-                  <div
-                    key={tool}
-                    className="p-3 bg-gray-50 rounded-lg flex items-center gap-3"
-                  >
-                    <img
-                      src={`https://cdn.simpleicons.org/${toSimpleIconSlug(tool)}/000000`}
-                      alt={tool}
-                      className="w-4 h-4"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display =
-                          "none";
-                      }}
-                    />
-                    <span className="text-sm text-gray-700">{tool}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
         </section>
+      ) : (
+        hasSkillsOrTools && (
+          <section className="mb-20">
+            <h2 className="text-3xl mb-8">Skills &amp; Tools</h2>
+            {hasSkills && (
+              <div className="mb-8">
+                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
+                  Skills
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {skills.map((skill) => (
+                    <div
+                      key={skill}
+                      className="p-3 bg-gray-50 rounded-lg flex items-center gap-2"
+                    >
+                      <span className="text-sm text-gray-700">{skill}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {hasTools && (
+              <div className="mt-10">
+                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-4">
+                  Tools
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {tools.map((tool) => (
+                    <div
+                      key={tool}
+                      className="p-3 bg-gray-50 rounded-lg flex items-center gap-3"
+                    >
+                      <img
+                        src={`https://cdn.simpleicons.org/${toSimpleIconSlug(tool)}/000000`}
+                        alt={tool}
+                        className="w-4 h-4"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display =
+                            "none";
+                        }}
+                      />
+                      <span className="text-sm text-gray-700">{tool}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )
       )}
 
       {/* 6. A bit more about me */}
-      {hasMoreAbout && (
+      {loading ? (
         <section className="mb-20">
-          <h2 className="text-3xl mb-8">A bit more about me</h2>
-          <div className="space-y-4 text-gray-700">
-            {offTheClock && (
-              <p>
-                <span className="font-medium">Off the clock:</span>{" "}
-                {offTheClock}
-              </p>
-            )}
-            {alsoMe && (
-              <p>
-                <span className="font-medium">Also me:</span> {alsoMe}
-              </p>
-            )}
-            {currentObsession && (
-              <p>
-                <span className="font-medium">Current obsession:</span>{" "}
-                {currentObsession}
-              </p>
-            )}
+          <div className="h-8 w-32 bg-gray-100 rounded mb-8 animate-pulse" />
+          <div className="space-y-6">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="border-l-2 border-gray-100 pl-6 space-y-2"
+              >
+                <div className="h-5 w-48 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+              </div>
+            ))}
           </div>
         </section>
+      ) : (
+        hasMoreAbout && (
+          <section className="mb-20">
+            <h2 className="text-3xl mb-8">A bit more about me</h2>
+            <div className="space-y-4 text-gray-700">
+              {offTheClock && (
+                <p>
+                  <span className="font-medium">Off the clock:</span>{" "}
+                  {offTheClock}
+                </p>
+              )}
+              {alsoMe && (
+                <p>
+                  <span className="font-medium">Also me:</span> {alsoMe}
+                </p>
+              )}
+              {currentObsession && (
+                <p>
+                  <span className="font-medium">Current obsession:</span>{" "}
+                  {currentObsession}
+                </p>
+              )}
+            </div>
+          </section>
+        )
       )}
       </div>
 
