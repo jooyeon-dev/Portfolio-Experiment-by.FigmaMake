@@ -112,8 +112,6 @@ type SiteInfo = {
   hero_cta_secondary: string;
   contact_email: string;
   linkedin_url: string;
-  github_url: string;
-  dribbble_url: string;
 };
 
 type HowItem = {
@@ -222,8 +220,6 @@ const DEFAULT_SITE_INFO: SiteInfo = {
   hero_cta_secondary: "",
   contact_email: "",
   linkedin_url: "",
-  github_url: "",
-  dribbble_url: "",
 };
 
 const DEFAULT_ABOUT: AboutInfo = {
@@ -402,8 +398,6 @@ export function Admin() {
           hero_cta_secondary: row.hero_cta_secondary ?? "",
           contact_email: row.contact_email ?? "",
           linkedin_url: row.linkedin_url ?? "",
-          github_url: row.github_url ?? "",
-          dribbble_url: row.dribbble_url ?? "",
         });
       } else {
         setSiteInfo(DEFAULT_SITE_INFO);
@@ -3298,41 +3292,6 @@ export function Admin() {
                     }))
                   }
                   placeholder="e.g. Currently open to junior product design opportunities."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Links */}
-          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
-            <h2 className="text-lg font-medium">Links</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  GitHub URL
-                </label>
-                <Input
-                  value={siteInfo.github_url}
-                  onChange={(e) =>
-                    setSiteInfo((prev) => ({
-                      ...prev,
-                      github_url: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Dribbble URL
-                </label>
-                <Input
-                  value={siteInfo.dribbble_url}
-                  onChange={(e) =>
-                    setSiteInfo((prev) => ({
-                      ...prev,
-                      dribbble_url: e.target.value,
-                    }))
-                  }
                 />
               </div>
             </div>
