@@ -1,10 +1,11 @@
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useFeaturedProjects } from "../hooks/useFeaturedProjects";
 import { useHomeContent } from "../hooks/useHomeContent";
 
 export function Home() {
+  const navigate = useNavigate();
   const { projects: featuredProjects, loading: projectsLoading, error } =
     useFeaturedProjects(3);
   const { how, currently, values, about, hero, loading } = useHomeContent();
@@ -42,12 +43,19 @@ export function Home() {
                   {hero?.ctaPrimary ?? "View my work"}
                   <ArrowRight size={20} />
                 </Link>
-                <Link
-                  to="/contact"
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate("/about");
+                    setTimeout(() => {
+                      const el = document.getElementById("connect");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }, 300);
+                  }}
                   className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full border border-gray-300 hover:border-gray-900 transition-colors"
                 >
                   {hero?.ctaSecondary ?? "Get in touch"}
-                </Link>
+                </button>
               </div>
             </>
           )}

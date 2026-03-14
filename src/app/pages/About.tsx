@@ -423,7 +423,7 @@ export function About() {
       </div>
 
       {/* 7. Contact & Availability (full-width) */}
-      <section className="w-screen relative left-1/2 -translate-x-1/2 bg-gray-900 px-8 py-20 -mb-24">
+      <section id="connect" className="w-screen relative left-1/2 -translate-x-1/2 bg-gray-900 px-8 py-20 -mb-24">
         <div className="max-w-4xl mx-auto mb-0 pb-0">
           <h2 className="text-3xl mb-8 text-white">Let&apos;s connect</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
