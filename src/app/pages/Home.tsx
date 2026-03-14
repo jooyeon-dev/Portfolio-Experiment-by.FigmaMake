@@ -5,37 +5,52 @@ import { useFeaturedProjects } from "../hooks/useFeaturedProjects";
 import { useHomeContent } from "../hooks/useHomeContent";
 
 export function Home() {
-  const { projects: featuredProjects, loading, error } = useFeaturedProjects(3);
-  const { how, currently, values, about, hero } = useHomeContent();
+  const { projects: featuredProjects, loading: projectsLoading, error } =
+    useFeaturedProjects(3);
+  const { how, currently, values, about, hero, loading } = useHomeContent();
 
   return (
     <div>
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <div className="max-w-4xl">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6">
-            {hero?.headline ??
-              "Product Designer crafting meaningful digital experiences"}
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8">
-            {hero?.description ??
-              "I design user-centered products that solve real problems and delight users."}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              to="/projects"
-              className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
-            >
-              {hero?.ctaPrimary ?? "View my work"}
-              <ArrowRight size={20} />
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full border border-gray-300 hover:border-gray-900 transition-colors"
-            >
-              {hero?.ctaSecondary ?? "Get in touch"}
-            </Link>
-          </div>
+          {loading ? (
+            <div className="space-y-4 max-w-4xl">
+              <div className="h-16 w-3/4 bg-gray-100 rounded animate-pulse" />
+              <div className="h-6 w-full bg-gray-100 rounded animate-pulse" />
+              <div className="h-6 w-2/3 bg-gray-100 rounded animate-pulse" />
+              <div className="flex gap-3 mt-4">
+                <div className="h-12 w-36 bg-gray-100 rounded-full animate-pulse" />
+                <div className="h-12 w-36 bg-gray-100 rounded-full animate-pulse" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6">
+                {hero?.headline ??
+                  "Product Designer crafting meaningful digital experiences"}
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 mb-8">
+                {hero?.description ??
+                  "I design user-centered products that solve real problems and delight users."}
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  to="/projects"
+                  className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
+                >
+                  {hero?.ctaPrimary ?? "View my work"}
+                  <ArrowRight size={20} />
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full border border-gray-300 hover:border-gray-900 transition-colors"
+                >
+                  {hero?.ctaSecondary ?? "Get in touch"}
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -51,19 +66,32 @@ export function Home() {
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {how.map((item, index) => (
-              <div key={item.id} className="space-y-3">
-                <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm">
-                  {String(index + 1).padStart(2, "0")}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 animate-pulse" />
+                  <div className="h-6 w-48 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+                  <div className="h-4 w-4/5 bg-gray-100 rounded animate-pulse" />
                 </div>
-                <h3 className="text-xl">{item.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {how.map((item, index) => (
+                <div key={item.id} className="space-y-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <h3 className="text-xl">{item.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -77,14 +105,22 @@ export function Home() {
             </p>
           </div>
           <div className="md:flex-1">
-            <ul className="space-y-2">
-              {currently.map((item) => (
-                <li key={item.id} className="flex gap-3 text-sm text-gray-700">
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-900 flex-shrink-0" />
-                  <span>{item.item}</span>
-                </li>
-              ))}
-            </ul>
+            {loading ? (
+              <ul className="space-y-2 w-full">
+                {[1, 2, 3].map((i) => (
+                  <li key={i} className="h-4 bg-gray-100 rounded animate-pulse w-full" />
+                ))}
+              </ul>
+            ) : (
+              <ul className="space-y-2">
+                {currently.map((item) => (
+                  <li key={item.id} className="flex gap-3 text-sm text-gray-700">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-900 flex-shrink-0" />
+                    <span>{item.item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
@@ -111,7 +147,7 @@ export function Home() {
           </p>
         )}
 
-        {loading ? (
+        {projectsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Array.from({ length: 3 }).map((_, index) => (
               <div
@@ -169,19 +205,31 @@ export function Home() {
       <section className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl mb-10">Principles & Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {values.map((value) => (
-              <div key={value.id} className="space-y-3">
-                <div className="text-sm text-gray-500 uppercase tracking-[0.18em]">
-                  {value.number}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-3">
+                  <div className="h-4 w-8 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-6 w-40 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
                 </div>
-                <h3 className="text-xl">{value.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {value.description}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {values.map((value) => (
+                <div key={value.id} className="space-y-3">
+                  <div className="text-sm text-gray-500 uppercase tracking-[0.18em]">
+                    {value.number}
+                  </div>
+                  <h3 className="text-xl">{value.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {value.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -198,32 +246,44 @@ export function Home() {
                 pixels.
               </p>
             </div>
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-gray-700">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
-                  Off the clock
-                </p>
-                <p className="leading-relaxed whitespace-pre-line">
-                  {about?.off_the_clock}
-                </p>
+            {loading ? (
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+                    <div className="h-4 w-4/5 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                ))}
               </div>
-              <div>
-                <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
-                  Also me
-                </p>
-                <p className="leading-relaxed whitespace-pre-line">
-                  {about?.also_me}
-                </p>
+            ) : (
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-gray-700">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
+                    Off the clock
+                  </p>
+                  <p className="leading-relaxed whitespace-pre-line">
+                    {about?.off_the_clock}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
+                    Also me
+                  </p>
+                  <p className="leading-relaxed whitespace-pre-line">
+                    {about?.also_me}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
+                    Current obsession
+                  </p>
+                  <p className="leading-relaxed whitespace-pre-line">
+                    {about?.current_obsession}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase mb-2">
-                  Current obsession
-                </p>
-                <p className="leading-relaxed whitespace-pre-line">
-                  {about?.current_obsession}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
