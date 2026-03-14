@@ -22,14 +22,20 @@ const FALLBACK_SITE_INFO: SiteInfo = {
   showEmail: true,
 };
 
-export function useSiteInfo(): SiteInfo {
+export type UseSiteInfoResult = SiteInfo & { loading: boolean };
+
+export function useSiteInfo(): UseSiteInfoResult {
   const [siteInfo, setSiteInfo] = useState<SiteInfo>(FALLBACK_SITE_INFO);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      if (!supabase) return;
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from("site_info")
@@ -39,29 +45,33 @@ export function useSiteInfo(): SiteInfo {
         .limit(1)
         .maybeSingle();
 
-      if (cancelled || error || !data) return;
+      if (cancelled) return;
 
-      setSiteInfo({
-        name: (data.name as string | null) || FALLBACK_SITE_INFO.name,
-        role: (data.role as string | null) || FALLBACK_SITE_INFO.role,
-        contactEmail:
-          (data.contact_email as string | null) ||
-          FALLBACK_SITE_INFO.contactEmail,
-        linkedinUrl:
-          (data.linkedin_url as string | null) ||
-          FALLBACK_SITE_INFO.linkedinUrl,
-        footerDescription:
-          (data.footer_description as string | null) ??
-          FALLBACK_SITE_INFO.footerDescription,
-        showLinkedin:
-          typeof data.footer_show_linkedin === "boolean"
-            ? data.footer_show_linkedin
-            : FALLBACK_SITE_INFO.showLinkedin,
-        showEmail:
-          typeof data.footer_show_email === "boolean"
-            ? data.footer_show_email
-            : FALLBACK_SITE_INFO.showEmail,
-      });
+      if (!error && data) {
+        setSiteInfo({
+          name: (data.name as string | null) || FALLBACK_SITE_INFO.name,
+          role: (data.role as string | null) || FALLBACK_SITE_INFO.role,
+          contactEmail:
+            (data.contact_email as string | null) ||
+            FALLBACK_SITE_INFO.contactEmail,
+          linkedinUrl:
+            (data.linkedin_url as string | null) ||
+            FALLBACK_SITE_INFO.linkedinUrl,
+          footerDescription:
+            (data.footer_description as string | null) ??
+            FALLBACK_SITE_INFO.footerDescription,
+          showLinkedin:
+            typeof data.footer_show_linkedin === "boolean"
+              ? data.footer_show_linkedin
+              : FALLBACK_SITE_INFO.showLinkedin,
+          showEmail:
+            typeof data.footer_show_email === "boolean"
+              ? data.footer_show_email
+              : FALLBACK_SITE_INFO.showEmail,
+        });
+      }
+
+      setLoading(false);
     }
 
     load();
@@ -71,6 +81,6 @@ export function useSiteInfo(): SiteInfo {
     };
   }, []);
 
-  return siteInfo;
+  return { ...siteInfo, loading };
 }
 

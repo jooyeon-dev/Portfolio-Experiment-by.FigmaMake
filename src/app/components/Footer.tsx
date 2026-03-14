@@ -10,6 +10,7 @@ export function Footer() {
     footerDescription,
     showLinkedin,
     showEmail,
+    loading,
   } = useSiteInfo();
 
   return (
@@ -17,10 +18,21 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="mb-4">{name}</h3>
-            <p className="text-gray-600">
-              {footerDescription.trim().length > 0 ? footerDescription : role}
-            </p>
+            {loading ? (
+              <div className="space-y-2">
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+              </div>
+            ) : (
+              <>
+                <h3 className="mb-4">{name}</h3>
+                <p className="text-gray-600">
+                  {footerDescription.trim().length > 0
+                    ? footerDescription
+                    : role}
+                </p>
+              </>
+            )}
           </div>
 
           <div className="md:pl-12">
