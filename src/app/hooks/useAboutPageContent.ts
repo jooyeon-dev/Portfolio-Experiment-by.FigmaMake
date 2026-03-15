@@ -5,6 +5,7 @@ export type AboutExperienceItem = {
   role: string;
   company: string;
   period: string;
+  location: string;
   description: string;
 };
 
@@ -113,6 +114,7 @@ export function useAboutPageContent(): UseAboutPageContentResult {
               role: String(item.role ?? ""),
               company: String(item.company ?? ""),
               period: String(item.period ?? ""),
+              location: String(item.location ?? ""),
               description: String(item.description ?? ""),
             }))
           : [];

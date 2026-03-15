@@ -17,6 +17,7 @@ const FALLBACK_EXPERIENCE = [
     title: "Senior Product Designer",
     company: "Tech Innovators Inc.",
     period: "2023 - Present",
+    location: "",
     description:
       "Leading design initiatives for B2B SaaS platform, managing end-to-end product design from research to delivery.",
   },
@@ -24,6 +25,7 @@ const FALLBACK_EXPERIENCE = [
     title: "Product Designer",
     company: "Digital Solutions Co.",
     period: "2021 - 2023",
+    location: "",
     description:
       "Designed mobile and web applications for various clients across fintech, e-commerce, and healthcare industries.",
   },
@@ -31,6 +33,7 @@ const FALLBACK_EXPERIENCE = [
     title: "UX Designer",
     company: "Creative Agency",
     period: "2019 - 2021",
+    location: "",
     description:
       "Collaborated with cross-functional teams to create user-centered designs for startups and established brands.",
   },
@@ -109,6 +112,7 @@ export function About() {
           title: String(item.role ?? ""),
           company: String(item.company ?? ""),
           period: String(item.period ?? ""),
+          location: String(item.location ?? ""),
           description: String(item.description ?? ""),
         }))
       : FALLBACK_EXPERIENCE;
@@ -297,7 +301,14 @@ export function About() {
             {experience.map((job, index) => (
               <div key={index} className="border-l-2 border-gray-200 pl-6">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2">
-                  <h3 className="text-xl">{job.title}</h3>
+                  <h3 className="text-xl">
+                    {job.title}
+                    {job.location && (
+                      <span className="text-gray-400 font-normal text-base">
+                        &nbsp;({job.location})
+                      </span>
+                    )}
+                  </h3>
                   <span className="text-gray-500">{job.period}</span>
                 </div>
                 <p className="text-gray-600 mb-2">{job.company}</p>

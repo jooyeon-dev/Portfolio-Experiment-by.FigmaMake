@@ -152,6 +152,7 @@ type AboutInfo = {
     role: string;
     company: string;
     period: string;
+    location: string;
     description: string;
   }[];
   education: AboutEducationItem[];
@@ -459,7 +460,15 @@ export function Admin() {
           also_me: row.also_me ?? "",
           current_obsession: row.current_obsession ?? "",
           colleague_tags: row.colleague_tags ?? [],
-          experience: (row.experience as any[] | null) ?? [],
+          experience: ((row.experience as any[] | null) ?? []).map(
+            (item: any) => ({
+              role: item.role ?? "",
+              company: item.company ?? "",
+              period: item.period ?? "",
+              location: item.location ?? "",
+              description: item.description ?? "",
+            }),
+          ),
           education:
             educationSrc && educationSrc.length > 0
               ? educationSrc.map((item) => ({
@@ -2931,6 +2940,7 @@ export function Admin() {
                         role: "",
                         company: "",
                         period: "",
+                        location: "",
                         description: "",
                       },
                     ],
@@ -2997,6 +3007,20 @@ export function Admin() {
                       }
                     />
                   </div>
+                  <Input
+                    placeholder="Location"
+                    value={item.location}
+                    onChange={(e) =>
+                      setAboutInfo((prev) => ({
+                        ...prev,
+                        experience: prev.experience.map((exp, i) =>
+                          i === index
+                            ? { ...exp, location: e.target.value }
+                            : exp,
+                        ),
+                      }))
+                    }
+                  />
                   <Input
                     placeholder="Period"
                     value={item.period}
