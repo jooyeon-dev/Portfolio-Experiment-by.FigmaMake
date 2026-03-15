@@ -251,21 +251,18 @@ export function About() {
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-1">
                     <h3 className="text-xl">
                       {item.school || "Untitled education"}
+                      {item.location && (
+                        <span className="text-gray-500 font-normal text-lg">
+                          {" "}({item.location})
+                        </span>
+                      )}
                     </h3>
                     {item.period && (
                       <span className="text-gray-500">{item.period}</span>
                     )}
                   </div>
                   {item.major && (
-                    <p className="text-gray-600">
-                      <span className="font-medium">Major:</span> {item.major}
-                    </p>
-                  )}
-                  {item.location && (
-                    <p className="text-gray-600">
-                      <span className="font-medium">Location:</span>{" "}
-                      {item.location}
-                    </p>
+                    <p className="text-gray-600">{item.major}</p>
                   )}
                   {item.description && (
                     <p className="text-gray-600 mt-2">{item.description}</p>
