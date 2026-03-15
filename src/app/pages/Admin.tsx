@@ -141,9 +141,6 @@ type AboutInfo = {
   intro_text: string;
   intro_subtitle: string;
   resume_url: string;
-  based_in: string;
-  languages: string;
-  studies: string;
   off_the_clock: string;
   also_me: string;
   current_obsession: string;
@@ -229,9 +226,6 @@ const DEFAULT_ABOUT: AboutInfo = {
   intro_text: "",
   intro_subtitle: "",
   resume_url: "",
-  based_in: "",
-  languages: "",
-  studies: "",
   off_the_clock: "",
   also_me: "",
   current_obsession: "",
@@ -453,9 +447,6 @@ export function Admin() {
           intro_text: row.intro_text ?? "",
           intro_subtitle: row.intro_subtitle ?? "",
           resume_url: row.resume_url ?? "",
-          based_in: row.based_in ?? "",
-          languages: row.languages ?? "",
-          studies: row.studies ?? "",
           off_the_clock: row.off_the_clock ?? "",
           also_me: row.also_me ?? "",
           current_obsession: row.current_obsession ?? "",
@@ -2570,51 +2561,6 @@ export function Admin() {
                     placeholder="Passionate about creating intuitive and delightful user experiences"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      Based in
-                    </label>
-                    <Input
-                      value={aboutInfo.based_in}
-                      onChange={(e) =>
-                        setAboutInfo((prev) => ({
-                          ...prev,
-                          based_in: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      Languages
-                    </label>
-                    <Input
-                      value={aboutInfo.languages}
-                      onChange={(e) =>
-                        setAboutInfo((prev) => ({
-                          ...prev,
-                          languages: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">
-                    Studies
-                  </label>
-                  <Textarea
-                    rows={3}
-                    value={aboutInfo.studies}
-                    onChange={(e) =>
-                      setAboutInfo((prev) => ({
-                        ...prev,
-                        studies: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -3207,41 +3153,18 @@ export function Admin() {
           {/* Profile */}
           <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
             <h2 className="text-lg font-medium">Profile</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Name</label>
-                <Input
-                  value={siteInfo.name}
-                  onChange={(e) =>
-                    setSiteInfo((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Role</label>
-                <Input
-                  value={siteInfo.role}
-                  onChange={(e) =>
-                    setSiteInfo((prev) => ({ ...prev, role: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Location</label>
+            <div className="pt-2 border-t border-gray-200">
+              <label className="text-sm font-medium mb-1 block">Name</label>
               <Input
-                value={siteInfo.location}
+                value={siteInfo.name}
                 onChange={(e) =>
-                  setSiteInfo((prev) => ({
-                    ...prev,
-                    location: e.target.value,
-                  }))
+                  setSiteInfo((prev) => ({ ...prev, name: e.target.value }))
                 }
               />
             </div>
           </div>
 
-          {/* Contact */}
+          {/* Contact (includes Location and Availability) */}
           <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
             <h2 className="text-lg font-medium">Contact</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
@@ -3275,12 +3198,19 @@ export function Admin() {
                 />
               </div>
             </div>
-          </div>
-
-
-          {/* Availability */}
-          <div className="space-y-4 border border-gray-200 rounded-xl p-5 bg-white">
-            <h2 className="text-lg font-medium">Availability</h2>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Location</label>
+              <Input
+                value={siteInfo.location}
+                onChange={(e) =>
+                  setSiteInfo((prev) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
+                placeholder="e.g. Seoul, South Korea"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 items-start pt-2 border-t border-gray-200">
               <div className="flex items-center gap-2 mt-1">
                 <input

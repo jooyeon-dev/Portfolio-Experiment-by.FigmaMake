@@ -1,5 +1,10 @@
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { Download, Mail, MapPin, Linkedin as LinkedinIcon } from "lucide-react";
+import {
+  Download,
+  Mail,
+  MapPin,
+  Linkedin as LinkedinIcon,
+} from "lucide-react";
 import { useAboutPageContent } from "../hooks/useAboutPageContent";
 
 const FALLBACK_NAME = "Alex Morgan";
@@ -448,13 +453,6 @@ export function About() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <MapPin className="mt-1 text-gray-400" size={20} />
-              <div>
-                <p className="text-sm text-gray-400">Location</p>
-                <p className="text-white">{location}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
               <LinkedinIcon className="mt-1 text-gray-400" size={20} />
               <div>
                 <p className="text-sm text-gray-400">LinkedIn</p>
@@ -466,6 +464,13 @@ export function About() {
                 >
                   View profile
                 </a>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <MapPin className="mt-1 text-gray-400" size={20} />
+              <div>
+                <p className="text-sm text-gray-400">Location</p>
+                <p className="text-white">{location}</p>
               </div>
             </div>
           </div>
