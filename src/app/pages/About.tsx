@@ -411,23 +411,30 @@ export function About() {
         hasMoreAbout && (
           <section className="mb-20">
             <h2 className="text-3xl mb-8">A bit more about me</h2>
-            <div className="space-y-4 text-gray-700">
+            <div className="space-y-6">
               {offTheClock && (
-                <p>
-                  <span className="font-medium">Off the clock:</span>{" "}
-                  {offTheClock}
-                </p>
+                <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2.5fr)] gap-8 items-start">
+                  <p className="text-sm font-medium text-gray-400 uppercase tracking-widest pt-0.5">
+                    Off the clock
+                  </p>
+                  <p className="text-gray-700">{offTheClock}</p>
+                </div>
               )}
               {alsoMe && (
-                <p>
-                  <span className="font-medium">Also me:</span> {alsoMe}
-                </p>
+                <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2.5fr)] gap-8 items-start">
+                  <p className="text-sm font-medium text-gray-400 uppercase tracking-widest pt-0.5">
+                    Also me
+                  </p>
+                  <p className="text-gray-700">{alsoMe}</p>
+                </div>
               )}
               {currentObsession && (
-                <p>
-                  <span className="font-medium">Current obsession:</span>{" "}
-                  {currentObsession}
-                </p>
+                <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2.5fr)] gap-8 items-start">
+                  <p className="text-sm font-medium text-gray-400 uppercase tracking-widest pt-0.5">
+                    Current obsession
+                  </p>
+                  <p className="text-gray-700">{currentObsession}</p>
+                </div>
               )}
             </div>
           </section>
