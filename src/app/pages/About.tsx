@@ -252,9 +252,9 @@ export function About() {
                     <h3 className="text-xl">
                       {item.school || "Untitled education"}
                       {item.location && (
-                        <span className="text-gray-500 font-normal text-lg">
-                          {" "}({item.location})
-                        </span>
+                      <span className="text-gray-400 font-normal text-base">
+                      &nbsp;({item.location})
+                    </span>                    
                       )}
                     </h3>
                     {item.period && (
@@ -262,10 +262,10 @@ export function About() {
                     )}
                   </div>
                   {item.major && (
-                    <p className="text-gray-600">{item.major}</p>
+                    <p className="text-gray-600 mb-2">{item.major}</p>
                   )}
                   {item.description && (
-                    <p className="text-gray-600 mt-2">{item.description}</p>
+                    <p className="text-gray-600">{item.description}</p>
                   )}
                 </div>
               ))}
