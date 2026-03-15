@@ -48,8 +48,15 @@ export function Home() {
                   onClick={() => {
                     navigate("/about");
                     setTimeout(() => {
-                      const el = document.getElementById("connect");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      const tryScroll = (attempts: number) => {
+                        const el = document.getElementById("connect");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth" });
+                        } else if (attempts > 0) {
+                          setTimeout(() => tryScroll(attempts - 1), 100);
+                        }
+                      };
+                      tryScroll(5);
                     }, 250);
                   }}
                   className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full border border-gray-300 hover:border-gray-900 transition-colors"
