@@ -28,6 +28,7 @@ interface ProjectDetailData {
   company: string;
   location: string | null;
   period: string | null;
+  subtitle: string | null;
   confidentialityNotice: string | null;
   overviewTitle: string | null;
   overviewContent: string | null;
@@ -161,6 +162,7 @@ export function ProjectDetail() {
         company: (data.company as string | null) ?? "",
         location: (data.location as string | null) ?? null,
         period: (data.period as string | null) ?? null,
+        subtitle: (data.subtitle as string | null) ?? null,
         confidentialityNotice:
           (data.confidentiality_notice as string | null) ?? null,
         overviewTitle: (data.overview_title as string | null) ?? null,
@@ -286,9 +288,14 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
           {/* 2. Project basics */}
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-3">
               {project.title}
             </h1>
+            {project.subtitle && (
+              <p className="text-xl text-gray-600 mb-6">
+                {project.subtitle}
+              </p>
+            )}
 
             <div className="flex flex-wrap gap-2 mb-6">
               {project.tags.map((tag) => (

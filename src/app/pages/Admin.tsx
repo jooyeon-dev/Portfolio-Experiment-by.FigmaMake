@@ -41,9 +41,11 @@ type AdminProject = {
   company: string | null;
   location: string | null;
   period: string | null;
+  is_featured: boolean;
   tags: string[];
   hero_images: string[];
   order_index: number;
+  subtitle: string | null;
   overview_title: string | null;
   overview_content: string | null;
   metrics: MetricInput[];
@@ -67,7 +69,8 @@ type ProjectFormValues = {
   id: string | null;
   title: string;
   company: string;
-  location_period: string;
+  location: string;
+  period: string;
   description: string;
   highlights: string[];
   tags: string[];
@@ -173,7 +176,8 @@ const DEFAULT_PROJECT: ProjectFormValues = {
   id: null,
   title: "",
   company: "",
-  location_period: "",
+  location: "",
+  period: "",
   description: "",
   highlights: [],
   tags: [],
@@ -756,15 +760,12 @@ export function Admin() {
   function handleSelectProject(project: AdminProject) {
     setSelectedProjectId(project.id);
     setActiveProjectStep(1);
-    const locationPeriod =
-      project.period && project.location
-        ? `${project.period} · ${project.location}`
-        : project.period || project.location || "";
     reset({
       id: project.id,
       title: project.title ?? "",
       company: project.company ?? "",
-      location_period: locationPeriod,
+      location: project.location ?? "",
+      period: project.period ?? "",
       description: "",
       highlights: [],
       tags: project.tags ?? [],
@@ -811,9 +812,11 @@ export function Admin() {
       id,
       title: values.title,
       company: values.company,
+      is_featured: values.is_featured ?? false,
       tags: values.tags ?? [],
       hero_images: values.hero_images ?? [],
       order_index: values.order_index ?? 0,
+      subtitle: values.subtitle || null,
       overview_title: values.overview_title || null,
       overview_content: values.overview_content || null,
       metrics: values.metrics ?? EMPTY_METRICS,
@@ -831,10 +834,8 @@ export function Admin() {
       reflection: values.reflection || null,
       next_project_title: values.next_project_title || null,
       next_project_id: values.next_project_id || null,
-      location:
-        values.location_period?.split("·")[1]?.trim() || null,
-      period:
-        values.location_period?.split("·")[0]?.trim() || null,
+      location: values.location.trim() || null,
+      period: values.period.trim() || null,
     };
 
     // eslint-disable-next-line no-console
@@ -964,21 +965,6 @@ export function Admin() {
   function handleRemoveTag(index: number) {
     const next = tags.filter((_, i) => i !== index);
     setValue("tags", next, { shouldDirty: true });
-  }
-
-  function handleAddHighlight() {
-    setValue("highlights", [...highlights, ""], { shouldDirty: true });
-  }
-
-  function handleUpdateHighlight(index: number, value: string) {
-    const next = [...highlights];
-    next[index] = value;
-    setValue("highlights", next, { shouldDirty: true });
-  }
-
-  function handleRemoveHighlight(index: number) {
-    const next = highlights.filter((_, i) => i !== index);
-    setValue("highlights", next, { shouldDirty: true });
   }
 
   function handleAddContribution() {
@@ -1836,46 +1822,6 @@ export function Admin() {
                         />
 
                         {/* Highlights */}
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Highlights</p>
-                          <div className="space-y-2">
-                            {highlights.map((highlight, index) => (
-                              <div
-                                key={`${highlight}-${index}`}
-                                className="flex items-center gap-2"
-                              >
-                                <Input
-                                  value={highlight}
-                                  onChange={(e) =>
-                                    handleUpdateHighlight(
-                                      index,
-                                      e.target.value,
-                                    )
-                                  }
-                                  placeholder="Highlight bullet"
-                                />
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => handleRemoveHighlight(index)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={handleAddHighlight}
-                            >
-                              <Plus className="w-4 h-4" />
-                              Add highlight
-                            </Button>
-                          </div>
-                        </div>
-
                         {/* Tags */}
                         <div className="space-y-2">
                           <p className="text-sm font-medium">Tags</p>
@@ -1914,7 +1860,7 @@ export function Admin() {
                           </div>
                         </div>
 
-                        {/* Company / location_period / order */}
+                        {/* Company / location / period / order */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <FormField
                             control={control}
@@ -1930,14 +1876,29 @@ export function Admin() {
                           />
                           <FormField
                             control={control}
-                            name="location_period"
+                            name="location"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Location · Period</FormLabel>
+                                <FormLabel>Location</FormLabel>
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    placeholder="France · 2024–2026"
+                                    placeholder="Seoul, South Korea"
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={control}
+                            name="period"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Period</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    placeholder="2024–2026"
                                   />
                                 </FormControl>
                               </FormItem>

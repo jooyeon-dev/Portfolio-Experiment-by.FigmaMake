@@ -48,6 +48,7 @@ export function useFeaturedProjects(limit = 3): UseFeaturedProjectsResult {
       const { data, error: queryError } = await supabase
         .from("portfolio_projects")
         .select("id, title, company, overview_title, overview_content, hero_images")
+        .eq("is_featured", true)
         .order("created_at", { ascending: false })
         .limit(limit);
 
