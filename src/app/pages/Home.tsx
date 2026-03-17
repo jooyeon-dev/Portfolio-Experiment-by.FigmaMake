@@ -28,8 +28,14 @@ export function Home() {
           ) : (
             <>
               <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6">
-                {hero?.headline ??
-                  "Product Designer crafting meaningful digital experiences"}
+                {(hero?.headline ??
+                  "Product Designer crafting meaningful digital experiences")
+                  .split("\n")
+                  .map((line, index) => (
+                    <span key={index} className="block">
+                      {line}
+                    </span>
+                  ))}
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 mb-8">
                 {hero?.description ??

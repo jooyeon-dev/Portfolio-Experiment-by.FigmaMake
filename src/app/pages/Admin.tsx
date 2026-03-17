@@ -1234,7 +1234,8 @@ export function Admin() {
                 <label className="text-sm font-medium mb-1 block">
                   Hero headline
                 </label>
-                <Input
+                <Textarea
+                  rows={2}
                   value={siteInfo.hero_headline}
                   onChange={(e) =>
                     setSiteInfo((prev) => ({
