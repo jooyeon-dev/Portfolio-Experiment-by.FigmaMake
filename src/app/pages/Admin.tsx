@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
+import { projects as staticProjects } from "../data/projects";
 import {
   Form,
   FormControl,
@@ -356,7 +357,7 @@ export function Admin() {
             .select("*")
             .order("order_index", { ascending: true }),
           supabase
-            .from("projects")
+            .from("portfolio_projects")
             .select("*")
             .order("order_index", { ascending: true }),
           supabase.from("about").select("*").limit(1).maybeSingle(),
@@ -837,7 +838,7 @@ export function Admin() {
     };
 
     const { error } = await supabase
-      .from("projects")
+      .from("portfolio_projects")
       .upsert(payload, { onConflict: "id" });
 
     setSavingProject(false);
@@ -856,7 +857,7 @@ export function Admin() {
     reset({ ...values, id });
 
     const { data: refreshed } = await supabase
-      .from("projects")
+      .from("portfolio_projects")
       .select("*")
       .order("order_index", { ascending: true });
 
@@ -882,7 +883,10 @@ export function Admin() {
     if (!confirmed) return;
 
     setDeletingProjectId(id);
-    const { error } = await supabase.from("projects").delete().eq("id", id);
+    const { error } = await supabase
+      .from("portfolio_projects")
+      .delete()
+      .eq("id", id);
     setDeletingProjectId(null);
 
     if (error) {
@@ -895,6 +899,34 @@ export function Admin() {
     if (selectedProjectId === id) {
       handleNewProject();
     }
+  }
+
+  async function handleImportSampleProjects() {
+    if (!supabase) return;
+
+    const payload = staticProjects.map((p) => ({
+      id: crypto.randomUUID(),
+      title: p.title,
+      company: p.client,
+      period: p.year,
+      overview_title: p.overview,
+      overview_content: p.solution ?? p.overview,
+      hero_images: [p.image],
+      tags: p.tags,
+    }));
+
+    const { error } = await supabase
+      .from("portfolio_projects")
+      .upsert(payload, { onConflict: "id" });
+
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      window.alert("Failed to import sample projects.");
+      return;
+    }
+
+    window.alert("Sample projects imported successfully.");
   }
 
   async function handleHeroImageUpload(
@@ -1647,9 +1679,8 @@ export function Admin() {
                 <p className="text-xs text-gray-500">Loading…</p>
               )}
               {projects.map((project) => (
-                <button
+                <div
                   key={project.id}
-                  type="button"
                   onClick={() => handleSelectProject(project)}
                   className={`w-full text-left px-3 py-3 rounded-lg border flex items-center justify-between gap-3 text-sm transition-colors ${
                     selectedProjectId === project.id
@@ -1700,14 +1731,36 @@ export function Admin() {
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
-                </button>
+                </div>
               ))}
-              {!loadingProjects && projects.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  No projects yet. Create your first project on the right.
-                </p>
-              )}
             </div>
+            {!loadingProjects && projects.length === 0 && (
+              <div className="mt-4 space-y-3 text-sm text-gray-500">
+                <p>No projects yet.</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleImportSampleProjects}
+                  disabled={disabledBecauseNoSupabase}
+                >
+                  Import sample projects
+                </Button>
+                <div className="pt-2 border-t border-gray-200 space-y-2">
+                  <p className="text-xs uppercase tracking-[0.16em] text-gray-400">
+                    Sample projects preview
+                  </p>
+                  {staticProjects.map((p) => (
+                    <div key={p.id} className="text-xs text-gray-600">
+                      <span className="font-medium text-gray-800">
+                        {p.title}
+                      </span>
+                      {p.client && ` · ${p.client}`}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right: form */}
@@ -2579,16 +2632,15 @@ export function Admin() {
                         {aboutPhotoFiles.map((url) => {
                           const isSelected = aboutInfo.photo_url === url;
                           return (
-                            <button
+                            <div
                               key={url}
-                              type="button"
                               onClick={() =>
                                 setAboutInfo((prev) => ({
                                   ...prev,
                                   photo_url: url,
                                 }))
                               }
-                              className={`relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 border ${
+                              className={`relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 border cursor-pointer ${
                                 isSelected
                                   ? "border-2 border-gray-900"
                                   : "border-transparent"
@@ -2619,7 +2671,7 @@ export function Admin() {
                               >
                                 ×
                               </button>
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
