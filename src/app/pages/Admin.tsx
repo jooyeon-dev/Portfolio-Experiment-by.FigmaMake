@@ -39,14 +39,11 @@ type AdminProject = {
   id: string;
   title: string;
   company: string | null;
-  location_period: string | null;
-  description: string | null;
-  highlights: string[];
+  location: string | null;
+  period: string | null;
   tags: string[];
   hero_images: string[];
-  is_featured: boolean;
   order_index: number;
-  subtitle: string | null;
   overview_title: string | null;
   overview_content: string | null;
   metrics: MetricInput[];
@@ -759,13 +756,17 @@ export function Admin() {
   function handleSelectProject(project: AdminProject) {
     setSelectedProjectId(project.id);
     setActiveProjectStep(1);
+    const locationPeriod =
+      project.period && project.location
+        ? `${project.period} · ${project.location}`
+        : project.period || project.location || "";
     reset({
       id: project.id,
       title: project.title ?? "",
       company: project.company ?? "",
-      location_period: project.location_period ?? "",
-      description: project.description ?? "",
-      highlights: project.highlights ?? [],
+      location_period: locationPeriod,
+      description: "",
+      highlights: [],
       tags: project.tags ?? [],
       hero_images: project.hero_images ?? [],
       is_featured: project.is_featured ?? false,
@@ -810,14 +811,9 @@ export function Admin() {
       id,
       title: values.title,
       company: values.company,
-      location_period: values.location_period || null,
-      description: values.description || null,
-      highlights: values.highlights ?? [],
       tags: values.tags ?? [],
       hero_images: values.hero_images ?? [],
-      is_featured: values.is_featured ?? false,
       order_index: values.order_index ?? 0,
-      subtitle: values.subtitle || null,
       overview_title: values.overview_title || null,
       overview_content: values.overview_content || null,
       metrics: values.metrics ?? EMPTY_METRICS,
@@ -835,7 +831,14 @@ export function Admin() {
       reflection: values.reflection || null,
       next_project_title: values.next_project_title || null,
       next_project_id: values.next_project_id || null,
+      location:
+        values.location_period?.split("·")[1]?.trim() || null,
+      period:
+        values.location_period?.split("·")[0]?.trim() || null,
     };
+
+    // eslint-disable-next-line no-console
+    console.log("payload keys:", Object.keys(payload));
 
     const { error } = await supabase
       .from("portfolio_projects")
@@ -1706,9 +1709,13 @@ export function Admin() {
                       }`}
                     >
                       {project.company}
-                      {project.location_period
-                        ? ` · ${project.location_period}`
-                        : ""}
+                      {project.period && project.location
+                        ? ` · ${project.period} · ${project.location}`
+                        : project.period
+                          ? ` · ${project.period}`
+                          : project.location
+                            ? ` · ${project.location}`
+                            : ""}
                     </p>
                   </div>
                   <Button
