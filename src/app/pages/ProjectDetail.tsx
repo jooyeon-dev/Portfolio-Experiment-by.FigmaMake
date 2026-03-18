@@ -81,6 +81,7 @@ export function ProjectDetail() {
           [
             "id",
             "title",
+            "subtitle",
             "tags",
             "company",
             "location",

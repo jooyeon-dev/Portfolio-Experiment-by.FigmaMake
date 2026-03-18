@@ -51,7 +51,7 @@ export function useProjects(): UseProjectsResult {
       const { data, error: queryError } = await supabase
         .from("portfolio_projects")
         .select(
-          "id, title, company, period, overview_title, overview_content, hero_images, tags",
+          "id, title, company, period, description, overview_title, overview_content, hero_images, tags",
         )
         .order("created_at", { ascending: false });
 
@@ -69,6 +69,7 @@ export function useProjects(): UseProjectsResult {
             ? row.hero_images.map((img: any) => String(img))
             : [];
           const description =
+            String(row.description ?? "").trim() ||
             String(row.overview_title ?? "").trim() ||
             String(row.overview_content ?? "").trim();
           const tags: string[] = Array.isArray(row.tags)

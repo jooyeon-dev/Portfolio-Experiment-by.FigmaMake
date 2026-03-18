@@ -96,9 +96,11 @@ export function Projects() {
                     className="text-gray-400 group-hover:text-gray-900 group-hover:translate-x-1 transition-all flex-shrink-0"
                   />
                 </div>
-                <p className="text-gray-600 mb-4 line-clamp-2">
-                  {project.description}
-                </p>
+                {project.description && (
+                  <p className="text-gray-600 mb-4 line-clamp-2">
+                    {project.description}
+                  </p>
+                )}
                 {project.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {project.tags.slice(0, 3).map((tag) => (

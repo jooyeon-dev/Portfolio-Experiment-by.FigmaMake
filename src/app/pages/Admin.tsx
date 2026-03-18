@@ -813,6 +813,7 @@ export function Admin() {
       title: values.title,
       company: values.company,
       is_featured: values.is_featured ?? false,
+      description: values.description || null,
       tags: values.tags ?? [],
       hero_images: values.hero_images ?? [],
       order_index: values.order_index ?? 0,

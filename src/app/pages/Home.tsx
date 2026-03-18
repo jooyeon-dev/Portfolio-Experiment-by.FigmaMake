@@ -207,7 +207,11 @@ export function Home() {
                   />
                 </div>
                 <p className="text-gray-600 mb-2">{project.category}</p>
-                <p className="text-gray-500 line-clamp-2">{project.description}</p>
+                {project.description && (
+                  <p className="text-gray-500 line-clamp-2">
+                    {project.description}
+                  </p>
+                )}
               </Link>
             ))}
           </div>
