@@ -41,6 +41,7 @@ type AdminProject = {
   company: string | null;
   location: string | null;
   period: string | null;
+  description: string | null;
   is_featured: boolean;
   tags: string[];
   hero_images: string[];
@@ -766,7 +767,7 @@ export function Admin() {
       company: project.company ?? "",
       location: project.location ?? "",
       period: project.period ?? "",
-      description: "",
+      description: project.description ?? "",
       highlights: [],
       tags: project.tags ?? [],
       hero_images: project.hero_images ?? [],

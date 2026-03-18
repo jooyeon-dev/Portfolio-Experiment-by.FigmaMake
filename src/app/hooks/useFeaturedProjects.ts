@@ -47,7 +47,9 @@ export function useFeaturedProjects(limit = 3): UseFeaturedProjectsResult {
 
       const { data, error: queryError } = await supabase
         .from("portfolio_projects")
-        .select("id, title, company, overview_title, overview_content, hero_images")
+        .select(
+          "id, title, company, description, overview_title, overview_content, hero_images",
+        )
         .eq("is_featured", true)
         .order("created_at", { ascending: false })
         .limit(limit);
@@ -67,6 +69,7 @@ export function useFeaturedProjects(limit = 3): UseFeaturedProjectsResult {
             : [];
 
           const description =
+            String(row.description ?? "").trim() ||
             String(row.overview_title ?? "").trim() ||
             String(row.overview_content ?? "").trim();
 
